@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "doc-buddy"
+version = "0.1.0"
+description = "A command line tool that documents code"
+authors = ["Scott Lindsey <scott@scott.to>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.8"
+openai = "^1.26.0"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+

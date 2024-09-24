@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+set -e
+
+__here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+#------------------------------------------------------------------------------
+
+USER_CWD="$(pwd)"
+cd $__here
+
+# If poetry is not installed, ask the user to install it
+if ! command -v poetry &> /dev/null; then
+    echo "Poetry is not installed. Please install poetry and try again."
+    exit 1
+fi
+
+# Check if the virtual environment exists or if dependencies need to be installed
+if ! poetry env info --path &> /dev/null || ! poetry check &> /dev/null; then
+    # Install dependencies silently
+    poetry install --no-interaction --quiet
+fi
+
+# Run the main program silently if dependencies are already installed
+USER_CWD=$USER_CWD poetry run python src/main.py "$@"
+

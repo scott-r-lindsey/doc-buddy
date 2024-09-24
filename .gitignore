@@ -1,0 +1,12 @@
+__pycache__
+.DS_Store
+.old
+
+# VIM
+*.swp
+*.swo
+*~
+
+.idea/
+.env
+*.json
