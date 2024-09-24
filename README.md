@@ -39,8 +39,9 @@
 
   ```bash
   cp .env.dist .env
-    - Fill in the .env file with your OpenAI credentials, or configure your Ollama or other provider's details.
   ```
+
+- Fill in the .env file with your OpenAI credentials, or configure your Ollama or other provider's details.
 
 ### Adding `doc-buddy` to your PATH
 
