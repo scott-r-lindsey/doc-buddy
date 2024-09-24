@@ -1,21 +1,22 @@
-# Doc Buddy
+# doc-buddy
 
-`Doc Buddy` is a Python-based CLI tool for automatically generating documentation for your project files using OpenAI's API. The tool can process individual files or recursively document all files in a directory based on specified file types. This project is managed using [Poetry](https://python-poetry.org/), and the entry point is a bash script named `doc-buddy` located at the root of the repository.
+`doc-buddy` is a Python-based CLI tool for automatically generating documentation for your project files using OpenAI's API. The tool can process individual files or recursively document all files in a directory based on specified file types. This project is managed using [Poetry](https://python-poetry.org/), and the entry point is a bash script named `doc-buddy` located at the root of the repository.
 
 ## Features
 
-- **File Documentation**: Point `Doc Buddy` to a specific file and it will generate a documentation file with a `-apidoc.md` suffix next to it.
-- **Recursive Directory Documentation**: Point `Doc Buddy` to a directory, specify the file types to process, and it will document all matching files recursively.
+- **File Documentation**: Point `doc-buddy` to a specific file and it will generate a documentation file with a `-apidoc.md` suffix next to it.
+- **Recursive Directory Documentation**: Point `doc-buddy` to a directory, specify the file types to process, and it will document all matching files recursively.
 - **Dry-run Mode**: Optionally preview the files to be processed without generating documentation.
-- **Poetry Management**: The project dependencies and environment are managed via Poetry for easy setup and management.
+- **Automatic Poetry Installation**: The `doc-buddy` bash script will attempt to install Poetry and run `poetry install` if it's not already installed.
+- **Repository Root Context**: Users are expected to run `doc-buddy` from the root of the repository, as the path to the files is meaningful in the documentation.
 
 ## Installation
 
 ### Prerequisites
 
 - Python 3.8+
-- [Poetry](https://python-poetry.org/docs/#installation) for managing dependencies
 - OpenAI API credentials (set in a `.env` file)
+- [Poetry](https://python-poetry.org/) for dependency management 
 
 ### Setup
 
@@ -26,39 +27,68 @@
    cd doc-buddy
    ```
 
-2. Install the project dependencies using Poetry:
+2. The `doc-buddy` bash script will automatically attempt to install [Poetry](https://python-poetry.org/) and the project dependencies for you. Just make sure you have `curl` installed for Poetry installation:
 
    ```bash
-   poetry install
+   ./doc-buddy
    ```
 
 3. Set up your `.env` file in the project root directory with your OpenAI credentials:
 
+  - Copy the .env.dist file to .env:
+
+  ```bash
+  cp .env.dist .env
+    - Fill in the .env file with your OpenAI credentials, or configure your Ollama or other provider's details.
+  ```
+
+### Adding `doc-buddy` to your PATH
+
+To make `doc-buddy` available globally on your system without needing to be in the project directory, you can add it to your `PATH`. Here’s how:
+
+1. Navigate to the root of the repository where the `doc-buddy` script is located.
+
+2. Add the project directory to your `PATH` by appending the following line to your shell profile file (e.g., `.bashrc`, `.zshrc`, or `.profile`):
+
    ```bash
-   OPENAI_API_KEY=your-api-key-here
-   USER_CWD=/path/to/your/project
+   export PATH="/path/to/doc-buddy/repo:$PATH"
    ```
+
+   Replace `/path/to/doc-buddy/repo` with the actual path to the directory where `doc-buddy` resides.
+
+3. Reload your shell configuration by running:
+
+   ```bash
+   source ~/.bashrc  # or source ~/.zshrc, depending on your shell
+   ```
+
+Once this is done, you can run `doc-buddy` from anywhere on your system:
+
+```bash
+doc-buddy /path/to/file.js
+```
 
 ## Usage
 
-The main entry point is a bash script named `doc-buddy`, which you can use to document files or directories.
+Before running `doc-buddy`, make sure you are at the root of your repository, as the file paths are meaningful for generating accurate documentation.
 
 ### Documenting a Single File
 
 To document a single file:
 
 ```bash
-./doc-buddy /path/to/file.js
+doc-buddy ./some-file.py
 ```
 
-This will generate the documentation in a new file next to the target file, with the suffix `-apidoc.md` (e.g., `file.js-apidoc.md`).
+This will generate the documentation in a new file next to the target file, with the suffix `-apidoc.md` (e.g., `some-file.js-apidoc.md`).
 
 ### Documenting a Directory
 
 To document all files of certain types within a directory:
 
 ```bash
-./doc-buddy /path/to/directory --file-types py js jsx
+cd my-repo
+doc-buddy ./ --file-types py js jsx
 ```
 
 This will process all `.py`, `.js`, and `.jsx` files recursively in the directory and generate corresponding `-apidoc.md` files.
@@ -68,49 +98,13 @@ This will process all `.py`, `.js`, and `.jsx` files recursively in the director
 To perform a dry run (i.e., preview the files that would be processed):
 
 ```bash
-./doc-buddy /path/to/directory --file-types py js jsx --dry-run
+cd my-repo
+doc-buddy ./ --file-types py js jsx --dry-run
 ```
 
 This will list the files that would have been documented without actually generating any documentation.
 
-## Project Structure
-
-- `doc-buddy`: The bash script entry point for the project.
-- `ai.py`: Contains the functions for interacting with the OpenAI API.
-- `util.py`: Utility functions, such as reading files and getting absolute paths.
-- `.env`: Environment variables file (not included in the repo, needs to be created).
-- `README.md`: This file.
-
-## Bash Script (`doc-buddy`)
-
-Here’s a basic example of what your `doc-buddy` script might look like:
-
-```bash
-#!/bin/bash
-poetry run python -m doc_buddy "$@"
-```
-
-Make sure to give it execution permissions:
-
-```bash
-chmod +x doc-buddy
-```
-
-## Development
-
-1. To activate the Poetry shell:
-
-   ```bash
-   poetry shell
-   ```
-
-2. To run the tests:
-
-   ```bash
-   poetry run pytest
-   ```
-
 ## Contributing
 
-If you'd like to contribute to `Doc Buddy`, feel free to submit a pull request!
+If you'd like to contribute to `doc-buddy`, feel free to submit a pull request!
 

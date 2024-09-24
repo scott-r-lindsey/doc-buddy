@@ -10,10 +10,35 @@ __here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 USER_CWD="$(pwd)"
 cd $__here
 
-# If poetry is not installed, ask the user to install it
+# Function to install Poetry
+install_poetry() {
+    echo "Attempting to install Poetry..."
+    # Use curl to install poetry
+    if command -v curl &> /dev/null; then
+        curl -sSL https://install.python-poetry.org | python3 -
+    # Fallback to wget if curl is not installed
+    elif command -v wget &> /dev/null; then
+        wget -O- https://install.python-poetry.org | python3 -
+    else
+        echo "Neither curl nor wget is available to download Poetry. Please install one of these tools."
+        exit 1
+    fi
+
+    # Add Poetry to PATH
+    export PATH="$HOME/.local/bin:$PATH"
+    echo "Poetry has been installed. Please restart your terminal or run 'source ~/.bashrc' to update your PATH if necessary."
+}
+
+# Check if poetry is installed
 if ! command -v poetry &> /dev/null; then
-    echo "Poetry is not installed. Please install poetry and try again."
-    exit 1
+    echo "Poetry is not installed."
+    read -p "Would you like to install it now? [y/N]: " response
+    if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        install_poetry
+    else
+        echo "Please install Poetry and try again."
+        exit 1
+    fi
 fi
 
 # Check if the virtual environment exists or if dependencies need to be installed
