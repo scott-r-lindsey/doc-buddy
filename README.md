@@ -23,7 +23,7 @@
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/your-username/doc-buddy.git
+   git clone https://github.com/scott-r-lindsey/doc-buddy
    cd doc-buddy
    ```
 
