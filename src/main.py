@@ -11,6 +11,9 @@ def document_single_file(file_path, project_path, dry_run):
     """
     Document a single file and write the output to a file with '-apidoc.md' suffix.
     """
+    # the suffix to come from DOCUMENTATION_SUFFIX environment variable
+    suffix = os.getenv('DOCUMENTATION_SUFFIX', '-apidoc.md')
+
     try:
         if not dry_run:
             with open(file_path, 'r') as file:
@@ -22,7 +25,7 @@ def document_single_file(file_path, project_path, dry_run):
                                                      file_contents=file_contents)
             if documentation:
                 # Define output file path with original filename + '-apidoc.md' suffix
-                output_file_path = file_path.parent / (file_path.name + '-apidoc.md')
+                output_file_path = file_path.parent / (file_path.name + suffix)
 
                 # Write the documentation to the file
                 with open(output_file_path, 'w') as doc_file:
@@ -83,4 +86,3 @@ if __name__ == '__main__':
         args.file_types,
         args.dry_run
     )
-
