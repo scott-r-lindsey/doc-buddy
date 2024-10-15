@@ -7,7 +7,7 @@ def configure_openai():
     Configures the OpenAI API using the environment variables OPENAI_API_KEY and OPENAI_API_URL.
     """
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    openai.api_base = os.getenv("OPENAI_API_URL")
+    openai.base_url = os.getenv("OPENAI_API_URL")
 
 
 def document_file_via_openai(file_name, project_path, file_contents):
