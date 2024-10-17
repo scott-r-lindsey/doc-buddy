@@ -1,17 +1,32 @@
 import argparse
 import os
-from ai import configure_openai, document_file_via_openai
 from dotenv import load_dotenv
 from util import read_file, get_absolute_path
 from pathlib import Path
+from AIProvider.OpenAIProvider import OpenAIProvider
+from AIProvider.GoogleGenAIProvider import GoogleGenAIProvider
 
 load_dotenv()
+
+# Initialize provider globally
+provider = None
+
+def initialize_provider():
+    """
+    Initialize the AI provider.
+    """
+    global provider
+
+    if os.getenv('AI_PROVIDER') == 'GOOGLE':
+        provider = GoogleGenAIProvider()
+    else:
+        provider = OpenAIProvider()
 
 def document_single_file(file_path, project_path, dry_run):
     """
     Document a single file and write the output to a file with '-apidoc.md' suffix.
     """
-    # the suffix to come from DOCUMENTATION_SUFFIX environment variable
+    global provider  # Access the global provider
     suffix = os.getenv('DOCUMENTATION_SUFFIX', '-apidoc.md')
 
     try:
@@ -19,8 +34,8 @@ def document_single_file(file_path, project_path, dry_run):
             with open(file_path, 'r') as file:
                 file_contents = file.read()
 
-            # Document the file using OpenAI
-            documentation = document_file_via_openai(file_name=file_path.name,
+            # Document the file using the provider (OpenAI)
+            documentation = provider.document_file(file_name=file_path.name,
                                                      project_path=project_path,
                                                      file_contents=file_contents)
             if documentation:
@@ -51,8 +66,7 @@ def process_directory(directory_path, project_path, file_types, dry_run):
                 document_single_file(file_path, project_path, dry_run)
 
 def main(input_path, file_types, dry_run):
-    # Configure OpenAI API with the environment variables
-    configure_openai()
+    initialize_provider()  # Initialize the provider
 
     # Resolve the absolute path of the input (either file or directory)
     absolute_path = Path(get_absolute_path(input_path))
@@ -86,3 +100,4 @@ if __name__ == '__main__':
         args.file_types,
         args.dry_run
     )
+
