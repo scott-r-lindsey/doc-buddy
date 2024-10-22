@@ -1,6 +1,10 @@
-import openai
+"""
+This module contains functions for interacting with the OpenAI API to generate code documentation.
+"""
+
 import os
-import json
+import openai
+
 
 def configure_openai():
     """
@@ -37,9 +41,7 @@ def document_file_via_openai(file_name, project_path, file_contents):
     # If a custom prompt template is provided, use it with variable substitution
     if custom_prompt_template:
         prompt = custom_prompt_template.format(
-            file_name=file_name,
-            project_path=project_path,
-            file_contents=file_contents
+            file_name=file_name, project_path=project_path, file_contents=file_contents
         )
     else:
         prompt = default_prompt
@@ -48,12 +50,9 @@ def document_file_via_openai(file_name, project_path, file_contents):
     messages = [
         {
             "role": "system",
-            "content": "You are a helpful assistant that documents code in detail."
+            "content": "You are a helpful assistant that documents code in detail.",
         },
-        {
-            "role": "user",
-            "content": prompt
-        }
+        {"role": "user", "content": prompt},
     ]
 
     try:
@@ -63,7 +62,7 @@ def document_file_via_openai(file_name, project_path, file_contents):
             messages=messages,
             max_tokens=4096,  # Adjust token limit based on file size and required detail
             temperature=0.7,  # Creativity level
-            n=1
+            n=1,
         )
 
         response = response.parse()
@@ -74,4 +73,3 @@ def document_file_via_openai(file_name, project_path, file_contents):
     except Exception as e:
         print(f"Error occurred while generating documentation: {e}")
         return None
-
