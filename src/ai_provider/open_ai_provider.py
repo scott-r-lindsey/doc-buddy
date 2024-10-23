@@ -1,12 +1,17 @@
+"""
+This module provides an AI provider for interacting with the OpenAI API.
+"""
+
 import os
 import openai
-import json
-from .AIProvider import AIProvider
+from .ai_provider import AIProvider
+
 
 class OpenAIProvider(AIProvider):
     """
     AI provider for interacting with the OpenAI API.
     """
+
     def __init__(self):
         self.configure_openai()
 
@@ -19,7 +24,8 @@ class OpenAIProvider(AIProvider):
 
     def document_file(self, file_name, project_path, file_contents):
         """
-        Documents a file using the OpenAI API by providing the file path, file name, and its contents.
+        Documents a file using the OpenAI API by providing the file path, file
+        name, and its contents.
 
         Args:
             file_name (str): The name of the file to document.
@@ -30,7 +36,9 @@ class OpenAIProvider(AIProvider):
             str: The generated documentation for the file.
         """
         # Source the OpenAI model and custom prompt from environment variables
-        openai_model = os.getenv("OPENAI_MODEL", "gpt-4o")  # Default to "gpt-4o" if not set
+        openai_model = os.getenv(
+            "OPENAI_MODEL", "gpt-4o"
+        )  # Default to "gpt-4o" if not set
         custom_prompt_template = os.getenv("AI_PROMPT")
 
         # Default prompt if no custom prompt is provided
@@ -38,7 +46,8 @@ class OpenAIProvider(AIProvider):
             f"Please provide detailed documentation for the following file:\n\n"
             f"File Path: {project_path}/{file_name}\n\n"
             f"File Contents:\n{file_contents}\n\n"
-            f"Make sure to include explanations for all functions, classes, and key logic in the file."
+            f"Make sure to include explanations for all functions, classes, and "
+            f"key logic in the file."
         )
 
         # If a custom prompt template is provided, use it with variable substitution
@@ -46,7 +55,7 @@ class OpenAIProvider(AIProvider):
             prompt = custom_prompt_template.format(
                 file_name=file_name,
                 project_path=project_path,
-                file_contents=file_contents
+                file_contents=file_contents,
             )
         else:
             prompt = default_prompt
@@ -55,12 +64,9 @@ class OpenAIProvider(AIProvider):
         messages = [
             {
                 "role": "system",
-                "content": "You are a helpful assistant that documents code in detail."
+                "content": "You are a helpful assistant that documents code in detail.",
             },
-            {
-                "role": "user",
-                "content": prompt
-            }
+            {"role": "user", "content": prompt},
         ]
 
         try:
@@ -70,7 +76,7 @@ class OpenAIProvider(AIProvider):
                 messages=messages,
                 max_tokens=4096,  # Adjust token limit based on file size and required detail
                 temperature=0.7,  # Creativity level
-                n=1
+                n=1,
             )
 
             response = response.parse()
@@ -81,4 +87,3 @@ class OpenAIProvider(AIProvider):
         except Exception as e:
             print(f"Error occurred while generating documentation: {e}")
             return None
-
