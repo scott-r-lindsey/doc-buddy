@@ -19,7 +19,7 @@ class GoogleGenAIProvider(AIProvider):
         """
         Configures the GenAI API using the environment variable GOOGLE_GENAI_API_KEY.
         """
-        api_key = os.getenv("GOOGLE_GENAI_API_KEY")
+        api_key = os.getenv("GOOGLE_API_KEY")
         genai.configure(api_key=api_key)
 
     def document_file(self, file_name, project_path, file_contents):
@@ -36,9 +36,6 @@ class GoogleGenAIProvider(AIProvider):
             str: The generated documentation for the file.
         """
         # Source the model and custom prompt from environment variables
-        genai_model = os.getenv(
-            "GOOGLE_GENAI_MODEL", "models/chat-bison-001"
-        )  # Default to "models/chat-bison-001" if not set
         custom_prompt_template = os.getenv("AI_PROMPT")
 
         # Default prompt if no custom prompt is provided
@@ -62,15 +59,12 @@ class GoogleGenAIProvider(AIProvider):
 
         # Prepare the request payload for the chat API
         try:
-            response = genai.generate_message(
-                model=genai_model,
-                prompt=prompt,
-                temperature=0.7,  # Creativity level
-                max_output_tokens=4096,  # Adjust token limit based on file size and required detail
-            )
+            model = genai.GenerativeModel(os.getenv("GOOGLE_GEM_MODEL"))
+
+            response = model.generate_content(prompt)
 
             # Extract and return the documentation from the response
-            return response.messages[0].content
+            return response.text
 
         except Exception as e:
             print(f"Error occurred while generating documentation: {e}")

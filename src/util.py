@@ -52,7 +52,9 @@ def initialize_provider():
     """
     Initialize the AI provider.
     """
-    if os.getenv("AI_PROVIDER") == "GOOGLE":
+
+    # should work uppercase and lowercase, convert to uppercase
+    if os.getenv("AI_PROVIDER").upper() == "GOOGLE":
         provider = GoogleGenAIProvider()
     else:
         provider = OpenAIProvider()

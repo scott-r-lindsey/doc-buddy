@@ -37,6 +37,7 @@ def main(input_path, file_types, dry_run, summary):
 
     if summary:
         print("Generating summary...")
+        print("Not implemented yet.")
 
     else:
         if absolute_path.is_file():
