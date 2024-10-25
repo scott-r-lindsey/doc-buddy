@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from ai_provider.open_ai_provider import OpenAIProvider
 from ai_provider.google_gen_ai_provider import GoogleGenAIProvider
+from ai_provider.vertexai_ai_provider import VertexAIProvider
 
 
 def get_absolute_path(file_path):
@@ -54,9 +55,20 @@ def initialize_provider():
     """
 
     # should work uppercase and lowercase, convert to uppercase
-    if os.getenv("AI_PROVIDER").upper() == "GOOGLE":
+    if os.getenv("AI_PROVIDER").upper() == "GOOGLE-GEMINI":
+        print("Using Google Gemini AI provider")
         provider = GoogleGenAIProvider()
-    else:
+
+    elif os.getenv("AI_PROVIDER").upper() == "GOOGLE-VERTEXAI":
+        print("Using Vertex AI provider")
+        provider = VertexAIProvider()
+
+    elif os.getenv("AI_PROVIDER").upper() == "OPENAI":
+        print("Using OpenAI provider")
         provider = OpenAIProvider()
+
+    else:
+        print("Error: AI provider not found.")
+        exit(1)
 
     return provider
