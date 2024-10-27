@@ -8,7 +8,7 @@ __root="$__here/../"
 
 #------------------------------------------------------------------------------
 
-cd "$__root/src"
+cd "$__root"
 
 # Run pylint
-poetry run pylint .
+poetry run pylint ./src

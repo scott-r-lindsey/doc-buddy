@@ -4,17 +4,32 @@ https://github.com/scott-r-lindsey/doc-buddy/
 """
 import os
 import argparse
+from typing import Dict, List, Type
 from pathlib import Path
 from dotenv import load_dotenv
 from util import get_absolute_path, initialize_provider
 from document.single_file import document_single_file
+from ai_provider.ai_provider import AIProvider
 
 load_dotenv()
 
 
-def process_directory(directory_path, project_path, file_types, dry_run, provider):
+def process_directory(
+    directory_path: str,
+    project_path: str,
+    file_types: list[str],
+    dry_run: bool,
+    provider: Type[AIProvider]
+) -> None:
     """
-    Recursively process all files in a directory that match the given file types.
+    Processes the given directory.
+
+    Args:
+        directory_path (str): Path to the directory to process.
+        project_path (str): Path to the project.
+        file_types (list[str]): List of file types to include.
+        dry_run (bool): If True, perform a dry run.
+        provider (Type[AIProvider]): Instance of an AIProvider or subclass.
     """
     for root, _, files in os.walk(directory_path):
         for file_name in files:
@@ -22,10 +37,20 @@ def process_directory(directory_path, project_path, file_types, dry_run, provide
             if any(file_path.suffix == f".{file_type}" for file_type in file_types):
                 document_single_file(file_path, project_path, dry_run, provider)
 
-
-def main(input_path, file_types, dry_run, summary):
+def main(
+    input_path: str,
+    file_types: List[str],
+    dry_run: bool,
+    summary: Dict[str, int]
+) -> None:
     """
-    Main function to read a file or directory and optionally run in dry-run mode.
+    Main function to process files.
+
+    Args:
+        input_path (str): Path to the input directory or file.
+        file_types (List[str]): List of file types to process.
+        dry_run (bool): If True, perform a dry run.
+        summary (Dict[str, int]): A dictionary summarizing some information.
     """
     provider = initialize_provider()  # Initialize the provider
 
@@ -51,7 +76,12 @@ def main(input_path, file_types, dry_run, summary):
                 )
                 return
             # If it's a directory, process files recursively
-            process_directory(absolute_path, project_path, file_types, dry_run, provider)
+            process_directory(
+                absolute_path,
+                project_path,
+                file_types,
+                dry_run,
+                provider)
         else:
             print(f"Error: '{absolute_path}' is neither a file nor a directory.")
 

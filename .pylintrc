@@ -1,0 +1,31 @@
+[MASTER]
+# List of plugins (useful for mypy integration)
+# load-plugins=pylint.extensions.typecheck
+
+[MESSAGES CONTROL]
+# Disable any messages you find overly restrictive here
+disable=missing-docstring, invalid-name
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=100
+
+[DESIGN]
+# Minimum number of public methods for a class (set to 0 if none are mandatory)
+min-public-methods=1
+# Maximum number of attributes for a class (useful to avoid overly complex classes)
+max-attributes=10
+
+[REPORTS]
+# Disable the reports at the end of each run
+reports=no
+
+[REFACTORING]
+# Maximum number of arguments for a function/method
+max-args=5
+
+[VARIABLES]
+# Naming conventions for variables (adjust based on your project’s style)
+variable-rgx=[a-z_][a-z0-9_]{2,30}$
+argument-rgx=[a-z_][a-z0-9_]{2,30}$
+

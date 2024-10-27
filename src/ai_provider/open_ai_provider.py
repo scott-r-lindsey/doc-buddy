@@ -17,7 +17,8 @@ class OpenAIProvider(AIProvider):
 
     def configure_openai(self):
         """
-        Configures the OpenAI API using the environment variables OPENAI_API_KEY and OPENAI_API_URL.
+        Configures the OpenAI API using the environment variables
+        OPENAI_API_KEY and OPENAI_API_URL.
         """
         openai.api_key = os.getenv("OPENAI_API_KEY")
         openai.base_url = os.getenv("OPENAI_API_URL")
@@ -35,30 +36,13 @@ class OpenAIProvider(AIProvider):
         Returns:
             str: The generated documentation for the file.
         """
+
         # Source the OpenAI model and custom prompt from environment variables
         openai_model = os.getenv(
             "OPENAI_MODEL", "gpt-4o"
         )  # Default to "gpt-4o" if not set
-        custom_prompt_template = os.getenv("AI_PROMPT")
 
-        # Default prompt if no custom prompt is provided
-        default_prompt = (
-            f"Please provide detailed documentation for the following file:\n\n"
-            f"File Path: {project_path}/{file_name}\n\n"
-            f"File Contents:\n{file_contents}\n\n"
-            f"Make sure to include explanations for all functions, classes, and "
-            f"key logic in the file."
-        )
-
-        # If a custom prompt template is provided, use it with variable substitution
-        if custom_prompt_template:
-            prompt = custom_prompt_template.format(
-                file_name=file_name,
-                project_path=project_path,
-                file_contents=file_contents,
-            )
-        else:
-            prompt = default_prompt
+        prompt = self.generate_prompt(file_name, project_path, file_contents)
 
         # Prepare the message for the chat completion API
         messages = [
@@ -74,8 +58,8 @@ class OpenAIProvider(AIProvider):
             response = openai.chat.completions.with_raw_response.create(
                 model=openai_model,
                 messages=messages,
-                max_tokens=4096,  # Adjust token limit based on file size and required detail
-                temperature=0.7,  # Creativity level
+                max_tokens=4096,
+                temperature=0.7,
                 n=1,
             )
 
