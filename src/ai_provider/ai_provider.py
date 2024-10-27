@@ -12,7 +12,7 @@ class AIProvider(ABC):
     """
 
     @abstractmethod
-    def document_file(self, file_name, project_path, file_contents):
+    def document_file(self, file_name: str, project_path: str, file_contents: str):
         """
         Document a file.
         :param file_name: The name of the file.
@@ -20,9 +20,8 @@ class AIProvider(ABC):
         :param file_contents: The contents of the file.
         :return: The document ID.
         """
-        pass
 
-    def generate_prompt(self, file_name, project_path, file_contents):
+    def generate_prompt(self, file_name: str, project_path: str, file_contents: str):
         """
         Generate a prompt for the user to provide documentation for a file.
         :return: The prompt.

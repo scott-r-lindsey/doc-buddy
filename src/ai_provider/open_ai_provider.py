@@ -17,7 +17,8 @@ class OpenAIProvider(AIProvider):
 
     def configure_openai(self):
         """
-        Configures the OpenAI API using the environment variables OPENAI_API_KEY and OPENAI_API_URL.
+        Configures the OpenAI API using the environment variables
+        OPENAI_API_KEY and OPENAI_API_URL.
         """
         openai.api_key = os.getenv("OPENAI_API_KEY")
         openai.base_url = os.getenv("OPENAI_API_URL")
@@ -57,8 +58,8 @@ class OpenAIProvider(AIProvider):
             response = openai.chat.completions.with_raw_response.create(
                 model=openai_model,
                 messages=messages,
-                max_tokens=4096,  # Adjust token limit based on file size and required detail
-                temperature=0.7,  # Creativity level
+                max_tokens=4096,
+                temperature=0.7,
                 n=1,
             )
 

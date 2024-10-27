@@ -10,11 +10,12 @@ from ai_provider.google_gen_ai_provider import GoogleGenAIProvider
 from ai_provider.vertexai_ai_provider import VertexAIProvider
 
 
-def get_absolute_path(file_path):
+def get_absolute_path(file_path: str):
     """
-    Returns the absolute path of the file, taking into account the USER_CWD environment variable.
-    If USER_CWD is set, it uses that as the base directory; otherwise, it resolves the file path
-    from the current working directory.
+    Returns the absolute path of the file, taking into account the USER_CWD
+    environment variable.  If USER_CWD is set, it uses that as the base
+    directory; otherwise, it resolves the file path from the current working
+    directory.
     """
     user_cwd = os.getenv("USER_CWD")
 
@@ -27,7 +28,7 @@ def get_absolute_path(file_path):
     return absolute_path
 
 
-def read_file(file_path, dry_run=False):
+def read_file(file_path: str, dry_run=False):
     """
     Reads the content of the file at the given path.
     If the dry_run flag is set, it only prints the file path and does not read the file.
