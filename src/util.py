@@ -3,6 +3,7 @@ This module contains utility functions that are used by the main script.
 """
 
 import os
+import sys
 from pathlib import Path
 from ai_provider.open_ai_provider import OpenAIProvider
 from ai_provider.google_gen_ai_provider import GoogleGenAIProvider
@@ -54,21 +55,23 @@ def initialize_provider():
     Initialize the AI provider.
     """
 
+    provider_name = os.getenv("AI_PROVIDER").upper()
+
     # should work uppercase and lowercase, convert to uppercase
-    if os.getenv("AI_PROVIDER").upper() == "GOOGLE-GEMINI":
+    if provider_name == "GOOGLE-GEMINI":
         print("Using Google Gemini AI provider")
         provider = GoogleGenAIProvider()
 
-    elif os.getenv("AI_PROVIDER").upper() == "GOOGLE-VERTEXAI":
+    elif provider_name == "GOOGLE-VERTEXAI":
         print("Using Vertex AI provider")
         provider = VertexAIProvider()
 
-    elif os.getenv("AI_PROVIDER").upper() == "OPENAI":
+    elif provider_name == "OPENAI":
         print("Using OpenAI provider")
         provider = OpenAIProvider()
 
     else:
         print("Error: AI provider not found.")
-        exit(1)
+        sys.exit(1)
 
     return provider
