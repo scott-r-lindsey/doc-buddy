@@ -1,5 +1,6 @@
 import os
 import subprocess
+from pathlib import Path
 from config import config
 
 
@@ -10,9 +11,9 @@ def find_files():
     git_root = config.root_path
 
     if gitmode:
-        return get_git_repo_files(git_root, input_path)
+        return convert_str_array_to_path_array(get_git_repo_files(git_root, input_path))
 
-    return get_regular_folder_files(input_path)
+    return convert_str_array_to_path_array(get_regular_folder_files(input_path))
 
 
 def get_regular_folder_files(folder_path):
@@ -30,7 +31,7 @@ def get_regular_folder_files(folder_path):
     return files
 
 
-def get_git_repo_files(repo_path, folder_path=None):
+def get_git_repo_files(repo_path: Path, folder_path: Path = None):
     """
     Finds all the files in a specific folder within a git repository, honoring
     .gitignore and filtering by extensions.
@@ -81,3 +82,7 @@ def get_git_repo_files(repo_path, folder_path=None):
     except subprocess.CalledProcessError as e:
         print(f"Error running git command: {e}")
         return []
+
+
+def convert_str_array_to_path_array(str_array):
+    return [Path(os.path.join(config.input_path, file)) for file in str_array]

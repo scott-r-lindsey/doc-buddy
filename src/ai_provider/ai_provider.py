@@ -31,7 +31,7 @@ class AIProvider(ABC):
 
         # Default prompt if no custom prompt is provided
         default_prompt = (
-            f"Please provide detailed documentation for the following file:\n\n"
+            f"Please create a document which explains the following file:\n\n"
             f"File Path: {project_path}/{file_name}\n\n"
             f"File Contents:\n{file_contents}\n\n"
             f"Make sure to include explanations for all functions, classes, and key"

@@ -5,18 +5,14 @@ https://github.com/scott-r-lindsey/doc-buddy/
 
 # from document.tree import tree_from_dir, find_files, render_tree
 import os
-from dotenv import load_dotenv
-from util import initialize_provider
-from document.single_file import document_single_file
-from file import render_tree, find_files
+from pathlib import Path
 from config import config
+from util import initialize_provider
+from document import generate_doc, generate_toc
+from file import render_tree, find_files
 
-load_dotenv()
 
-
-def main(
-    input_path: str, dry_run: bool, summary: bool
-) -> None:
+def main(input_path: Path, dry_run: bool, summary: bool) -> None:
     """
     Main function to process files.
 
@@ -24,7 +20,7 @@ def main(
         input_path (str): Path to the input directory or file.
         file_types (List[str]): List of file types to process.
         dry_run (bool): If True, perform a dry run.
-        summary (Dict[str, int]): A dictionary summarizing some information.
+        summary (bool): A dictionary summarizing some information.
     """
     provider = initialize_provider()  # Initialize the provider
 
@@ -37,8 +33,14 @@ def main(
 
     else:
         if input_path.is_file():
-            # If it's a single file, document it
-            document_single_file(input_path, project_path, dry_run, provider)
+            if dry_run:
+                print("- Dry run enabled. No files will be created.")
+                print(f"File to be processed: {input_path}")
+
+            else:
+                # If it's a single file, document it
+                generate_doc(input_path, provider)
+                print("Done!")
 
         elif input_path.is_dir():
             files = find_files()
@@ -46,14 +48,21 @@ def main(
             if config.dry_run:
                 print("Dry run enabled. No files will be created.")
                 print("Files to be processed:")
-                print(render_tree(files, True))
+                print(render_tree(files))
+
+            else:
+                # If it's a directory, document all files in it
+                for file in files:
+                    generate_doc(file, provider)
+
+                # Generate table of contents
+                generate_toc(files)
+                print("Done!")
 
         else:
             print(f"Error: '{input_path}' is neither a file nor a directory.")
 
 
 if __name__ == "__main__":
-    config.initialize()
-
     # Pass file types only if the input is a directory
     main(config.input_path, config.dry_run, config.summary)

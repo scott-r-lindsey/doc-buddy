@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+from config import config
 
 
 def render_tree(files, markdown=False):
@@ -10,7 +12,10 @@ def render_tree(files, markdown=False):
     :return: A string representing the tree structure.
     """
     tree = {}
-    for file in files:
+    for file_path in files:
+        # get the path relative to config.input_path
+        file = os.path.relpath(file_path, config.input_path)
+
         parts = file.split(os.sep)
         current = tree
         for part in parts:
