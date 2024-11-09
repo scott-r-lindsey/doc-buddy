@@ -36,6 +36,7 @@ class AIProvider(ABC):
             f"File Contents:\n{file_contents}\n\n"
             f"Make sure to include explanations for all functions, classes, and key"
             f" logic in the file."
+            f" Do not wrap the output in a code block."
         )
 
         # If a custom prompt template is provided, use it with variable substitution

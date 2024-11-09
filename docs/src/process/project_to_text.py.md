@@ -1,58 +1,78 @@
-```
-# Documentation for /var/www/html/scott/doc-buddy/src/process/project_to_text.py
+## Documentation for `/var/www/html/scott/doc-buddy/src/process/project_to_text.py`
 
-This script defines functionality to convert project source code into a single text string. This simplified representation can then be used for further processing, such as documentation generation or code analysis. The script leverages the `os` and `typing` modules.
-
-## Function: `project_to_text(project_path: str) -> str`
-
-This function takes a project path as input and returns a single string containing all the textual content of the project's files. It iterates through all files within the project directory, reads their content, and concatenates them into a single string.  It handles various file types and potential errors.
-
-**Parameters:**
-
-* `project_path` (str): The absolute path to the root directory of the project.
-
-**Returns:**
-
-* `str`: A single string containing the concatenated content of all readable text files within the project. Returns an empty string if the `project_path` is invalid or an error occurs during processing.
-
-**Logic Breakdown:**
-
-1. **Input Validation:**  Checks if the provided `project_path` is a valid directory. If not, it returns an empty string.
-
-2. **File Iteration:** Uses `os.walk(project_path)` to traverse the directory tree. `os.walk` yields tuples for each directory it encounters, containing the directory path, a list of subdirectories, and a list of files within that directory.
-
-3. **File Processing:** For each file found:
-    * **Path Construction:** The absolute file path is constructed using `os.path.join(root, file)`.
-    * **File Reading:** Attempts to open the file in read mode (`'r'`) with UTF-8 encoding.
-    * **Error Handling:** Uses a `try...except` block to catch potential `UnicodeDecodeError` exceptions. This allows the script to skip files that are not readable as text (e.g., binary files) and continue processing. If an error occurs, a warning message is printed to the console using `print(f"Warning: Could not decode file {file_path}, skipping.")`.
-    * **Content Appending:** If the file is successfully read, its content is appended to the `project_text` string.
-    * **Newline Appending:** A newline character (`\n`) is added after each file's content to separate the content of different files in the final string.
-
-
-## Example Usage:
+This script defines the `ProjectToText` class, which is responsible for converting a project directory into a plain text representation.  This text representation can then be used for further processing, such as generating documentation or performing analysis. The script utilizes the `os` module for file system navigation and the `pathlib` module for path manipulation.
 
 ```python
-project_path = "/path/to/your/project"
-project_text = project_to_text(project_path)
-print(project_text) # Output: The combined text of all files in the project
+import os
+from pathlib import Path
+
+class ProjectToText:
+    def __init__(self, project_path):
+        self.project_path = project_path
+
+    def convert(self):
+        text = ""
+        for root, _, files in os.walk(self.project_path):
+            relative_path = os.path.relpath(root, self.project_path)
+            text += f"\n# Directory: {relative_path}\n\n"
+
+            for file in files:
+                file_path = os.path.join(root, file)
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        file_content = f.read()
+                        text += f"## File: {file}\n\n```\n{file_content}\n```\n\n"
+                except UnicodeDecodeError:
+                    text += f"## File: {file}\n\n```\n[Binary File - Could not decode]\n```\n\n"
+                except Exception as e:
+                    text += f"## File: {file}\n\n```\n[Error reading file: {e}]\n```\n\n"
+        return text
+
+
 ```
 
+**Class: `ProjectToText`**
 
-## Potential Improvements:
+This class encapsulates the logic for converting a project directory to text.
 
-* **Binary File Detection:** More robust binary file detection could be implemented to avoid unnecessary attempts to decode them. Libraries like `python-magic` could be used for this.
-* **Customizable File Inclusion/Exclusion:**  Allowing users to specify file extensions to include or exclude would enhance the script's flexibility.
-* **Progress Reporting:**  For very large projects, a progress indicator could be added to provide feedback to the user.
-* **More Granular Error Handling:** More specific error handling could be implemented to provide more informative error messages to the user.  For instance, distinguishing between `IOError` (file not found) and `UnicodeDecodeError` could be helpful.
+* **`__init__(self, project_path)`:**
+    * Constructor for the class.
+    * Takes the `project_path` (a string representing the path to the project directory) as an argument and stores it in the `self.project_path` instance variable.
+
+* **`convert(self)`:**
+    * This is the core method of the class. It traverses the project directory structure and concatenates the content of each file into a single string.
+    * Uses `os.walk(self.project_path)` to recursively traverse the project directory.  `os.walk` yields tuples of (root directory, list of subdirectories, list of files) for each directory it encounters.
+    * `relative_path = os.path.relpath(root, self.project_path)` calculates the relative path of the current directory (`root`) with respect to the project's root directory (`self.project_path`).  This ensures the output shows the directory structure relative to the project root.
+    * Appends a markdown-style heading indicating the current directory to the `text` string.
+    * Iterates through each `file` within the current directory.
+    * Constructs the full `file_path` using `os.path.join(root, file)`.
+    * Uses a `try-except` block to handle potential errors during file reading:
+        * **`UnicodeDecodeError`:**  If a file cannot be decoded using UTF-8, a message indicating it's a binary file is appended to the output.
+        * **`Exception`:** Catches any other exceptions during file reading and appends an error message to the output.
+    * If the file is successfully opened and read:
+        * Appends a markdown-style heading for the file name.
+        * Encloses the file content within a markdown code block (using triple backticks).
+    * Returns the final `text` string containing the concatenated content of all files and directory structure information.
 
 
-This documentation provides a comprehensive explanation of the `project_to_text.py` script, detailing its functionality, logic, and potential improvements.  It should help users understand and utilize the script effectively.
+
+**Example Usage:**
+
+```python
+converter = ProjectToText("/path/to/my/project")
+text_representation = converter.convert()
+print(text_representation) # Or save to a file
 ```
+
+This would create a `ProjectToText` object, convert the specified project directory to text, and then print the resulting text to the console.  You could then save this text to a file or process it further.
+
+
+This script provides a robust way to convert a project directory into a textual representation, handling various file types and potential errors during file I/O. The use of relative paths and markdown formatting makes the output more organized and readable.
 
 
 ---
 # Auto-generated Documentation for project_to_text.py
 This documentation is generated automatically from the source code. Do not edit this file directly.
-Generated by Doc-Buddy on 2024-11-01 18:05:29
+Generated by Doc-Buddy on 2024-11-09 11:32:55
 
-Git Hash: <built-in method strip of str object at 0x7fd12788f7b0>
+Git Hash: <built-in method strip of str object at 0x7fbac58ef8d0>

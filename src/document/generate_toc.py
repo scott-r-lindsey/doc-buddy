@@ -4,7 +4,7 @@ This module generates the Table of Contents (TOC) for the documentation.
 
 import os
 from datetime import datetime
-from file import render_tree
+from file import render_tree_html
 from config import config
 
 
@@ -14,7 +14,7 @@ def generate_toc(files):
     """
     name = find_name()
     header = generate_header(name)
-    body = render_tree(files, True)
+    body = render_tree_html(files, config.documentation_suffix)
 
     path = str(config.output_path) + os.sep + "index.md"
     with open(path, "w", encoding="utf-8") as f:

@@ -49,15 +49,18 @@ def generate_doc(file_path: Path, provider):
         with open(file_path, "r", encoding="utf-8") as file:
             file_contents = file.read()
 
+            documentation = generate_preface(relative_path)
+
             # Document the file using the provider
-            documentation = provider.document_file(
+            documentation += provider.document_file(
                 file_name=basename(file_path),
                 project_path=(file_path.parent),
                 file_contents=file_contents,
             )
 
             if documentation:
-                footer = generate_footer(basename(file_path))
+                footer = generate_footer(basename(relative_path))
+                documentation += generate_code_block(file_contents, relative_path)
                 documentation += footer
 
                 output_file_path = config.output_path / relative_path.parent / (
@@ -83,3 +86,66 @@ def generate_doc(file_path: Path, provider):
         sys.stdout.write(
             f"\rDocumenting file {file_path} - {elapsed_time:.2f} seconds\n"
         )
+
+def generate_preface(file_path: Path):
+    block = f"# AI Generated documentation for {file_path}\n"
+    block += f"---\n"
+
+    return block
+
+def generate_code_block(code: str, file_name):
+    """
+    Generate a code block with a specific language.
+    """
+    language = guess_language_for_markdown(file_name)
+
+    block = f"# Full listing of {file_name}\n"
+    block += f"```{language}\n{code}\n```\n"
+
+    return block
+
+
+def guess_language_for_markdown(filename):
+    # Extract the file extension
+    _, extension = os.path.splitext(filename)
+    extension = extension.lower()
+
+    # Define a mapping of extensions to languages for markdown
+    extension_mapping = {
+        ".py": "python",
+        ".js": "javascript",
+        ".ts": "typescript",
+        ".html": "html",
+        ".css": "css",
+        ".java": "java",
+        ".c": "c",
+        ".cpp": "cpp",
+        ".cs": "csharp",
+        ".rb": "ruby",
+        ".php": "php",
+        ".sh": "bash",
+        ".bash": "bash",
+        ".zsh": "bash",
+        ".go": "go",
+        ".rs": "rust",
+        ".swift": "swift",
+        ".json": "json",
+        ".yaml": "yaml",
+        ".yml": "yaml",
+        ".xml": "xml",
+        ".sql": "sql",
+        ".kt": "kotlin",
+        ".m": "matlab",
+        ".r": "r",
+        ".pl": "perl",
+        ".dockerfile": "dockerfile",
+        ".ps1": "powershell",
+        ".vim": "vim",
+        ".lua": "lua",
+        ".scala": "scala",
+        ".hs": "haskell",
+        ".md": "markdown"
+    }
+
+    # Return the markdown language string if found, else return plain text
+    return {extension_mapping.get(extension, '')}

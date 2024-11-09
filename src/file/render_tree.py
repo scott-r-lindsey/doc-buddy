@@ -40,3 +40,49 @@ def render_tree(files, markdown=False):
         return tree_str
 
     return build_tree_string(tree)
+
+
+def render_tree_html(files, extension=""):
+    """
+    Renders the list of files as an HTML tree structure, using monospace font for display.
+
+    :param files: List of file paths to be rendered as a tree.
+    :param extension: String to be added as an extension to each file link.
+    :return: A string representing the HTML tree structure.
+    """
+    tree = {}
+    for file_path in files:
+        # get the path relative to config.input_path
+        file = os.path.relpath(file_path, config.input_path)
+
+        parts = file.split(os.sep)
+        current = tree
+        for part in parts:
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+
+    def build_html_string(current, path="", indent=""):
+        html_str = ""
+        keys = sorted(current.keys())
+        for index, key in enumerate(keys):
+            is_last = index == len(keys) - 1
+            prefix = "└── " if is_last else "├── "
+            full_path = os.path.join(path, key)
+            if not current[key]:
+                # Apply the extension only to the final file link
+                full_path_with_extension = full_path + extension
+                # Render as an HTML link if it's a file
+                html_str += f'{indent}{prefix}<a href="{full_path_with_extension}" target="_blank">{key}</a><br>'
+            else:
+                html_str += f"{indent}{prefix}{key}<br>"
+            new_indent = indent + (
+                "&nbsp;&nbsp;&nbsp;&nbsp;" if is_last else "│&nbsp;&nbsp;&nbsp;"
+            )
+            html_str += build_html_string(current[key], full_path, new_indent)
+        return html_str
+
+    html_output = '<pre style="font-family: monospace;">'
+    html_output += build_html_string(tree)
+    html_output += "</pre>"
+    return html_output

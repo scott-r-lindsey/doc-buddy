@@ -29,6 +29,7 @@ class Config(BaseModel):
     summary: bool = False
     gitmode: bool = False
     provider: str
+    model: str
     documentation_suffix: str = ".md"
 
     def __init__(self):
@@ -39,6 +40,7 @@ class Config(BaseModel):
         args = self.parse_args()
 
         provider = os.getenv("AI_PROVIDER", "")
+        model = os.getenv("AI_MODEL", "")
         documentation_suffix = os.getenv("DOCUMENTATION_SUFFIX", ".md")
 
         user_cwd = Path(os.getcwd())
