@@ -1,5 +1,5 @@
 """
-This module generates the Table of Contents (TOC) for the documentation.
+This module generates the footer for the documentation.
 """
 
 import os

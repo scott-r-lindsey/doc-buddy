@@ -45,7 +45,7 @@ def main(input_path: Path, dry_run: bool, summary: bool) -> None:
         elif input_path.is_dir():
             files = find_files()
 
-            if config.dry_run:
+            if dry_run:
                 print("Dry run enabled. No files will be created.")
                 print("Files to be processed:")
                 print(render_tree(files))
