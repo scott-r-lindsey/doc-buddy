@@ -2,53 +2,34 @@
 
 # AI Generated documentation for `doc-buddy/src/process/project_to_text.py`
 ---
-This document describes the Python script `project_to_text.py` within the project `doc-buddy`.  This script's purpose is to extract text content from various project file types and consolidate it into a single string. This consolidated text can then be used for further processing, like indexing or searching.
+This document describes the Python script `project_to_text.py` within the `doc-buddy` project.  This script aims to extract textual content from various file types within a given project directory.  It supports a range of file extensions and uses different libraries for extraction based on the file type.
 
-The script utilizes the `extract_text_from_file` function, which dynamically imports and employs specialized extraction functions based on the file's extension.  It supports various file types, including `.txt`, `.pdf`, `.docx`, `.pptx`, and more. If a specific extraction function isn't available for a given file type, it defaults to a generic text extraction method.
+The script begins by importing necessary libraries: `os`, `sys`, `argparse`, `docx`, `PyPDF2`, and `openpyxl`.
 
-**Function Breakdown:**
+**Function: `process_file(filepath)`**
 
-* **`extract_text_from_file(file_path)`:**  This is the core function of the script. It takes the file path as input and returns the extracted text content as a string.  The function's logic can be broken down as follows:
+This function is the core of the script. It takes a file path as input and returns the extracted text content as a string.  It first determines the file's extension using `os.path.splitext()`. Then, based on the extension, it uses the appropriate library to extract the text:
 
-    1. **Determine File Extension:** It extracts the file extension using `os.path.splitext()`.
+* **`.docx` (Microsoft Word):** Uses the `docx` library to iterate through paragraphs and runs within the document, extracting text.
+* **`.pdf` (Portable Document Format):** Uses the `PyPDF2` library to extract text from each page of the PDF.
+* **`.xlsx` and `.xls` (Microsoft Excel):** Uses the `openpyxl` library to iterate through all cells in all sheets of the Excel file, extracting the cell values.
+* **`.txt` (Plain Text):** Simply reads the file content directly.
+* **Other extensions:** Returns an empty string, effectively skipping unsupported file types.
 
-    2. **Dynamic Import:** Based on the file extension, it attempts to import a corresponding extraction function. The naming convention for these functions is `extract_text_from_[extension]` (e.g., `extract_text_from_pdf` for `.pdf` files).  This dynamic import mechanism allows for modularity and extensibility – supporting new file types simply requires adding a new extraction function.  The `try-except` block handles cases where a specialized extractor isn't available.
+**Function: `process_directory(directory)`**
 
-    3. **Function Execution:** If the specific extraction function is found, it's called with the `file_path` as an argument.  The returned text is then returned by `extract_text_from_file`.
+This function takes a directory path as input and processes all files within that directory and its subdirectories.  It uses `os.walk()` to traverse the directory tree. For each file found, it calls `process_file()` to extract the text.  The extracted text from all files is concatenated into a single string and returned.
 
-    4. **Generic Extraction (Fallback):**  If no specific extraction function is found, the function attempts to open the file in text mode and read its contents directly. This serves as a fallback for unsupported file types, although it might not be ideal for all cases.  If this fails (e.g., for binary files), it returns an empty string.
+**Main Execution Block**
 
-**Example Usage (Illustrative):**
+The main part of the script uses the `argparse` library to handle command-line arguments.  It defines a required argument `-d` or `--directory` to specify the project directory.  It then parses the provided arguments.
 
-Although not explicitly included in the `project_to_text.py` script, the intended usage would likely involve iterating through project files and calling `extract_text_from_file` for each file. The returned text could then be aggregated.  A hypothetical example:
+If the specified directory exists, it calls `process_directory()` to extract text from all supported files within the directory. The extracted text is then printed to the console. If the directory doesn't exist, an error message is printed.
 
-```python
-import os
-from project_to_text import extract_text_from_file
-
-project_folder = "path/to/project"
-all_text = ""
-
-for filename in os.listdir(project_folder):
-    file_path = os.path.join(project_folder, filename)
-    extracted_text = extract_text_from_file(file_path)
-    all_text += extracted_text
-
-# Further processing with 'all_text'
-```
-
-**Key Logic and Design Considerations:**
-
-* **Modularity and Extensibility:** The dynamic import mechanism facilitates adding support for new file types without modifying the core `extract_text_from_file` function.
-* **Error Handling:** The `try-except` blocks handle cases where specialized extractors are not available or when file reading encounters issues.
-* **Fallback Mechanism:** The generic text extraction acts as a fallback for unsupported file types.
-* **Dependency Management:**  This script implicitly relies on the presence of other extraction functions (e.g., `extract_text_from_pdf`).  These functions would need to be defined elsewhere in the project and properly imported/available within the script's execution environment.
-
-
-This script provides a flexible and extensible solution for extracting text from various file types within a project. Its modular design allows for easy maintenance and future additions of support for new file formats.
+In summary, this script provides a simple way to extract text content from a variety of file types within a project directory. It's designed to be used from the command line, taking the project directory as input.  The extracted text is then output to the console, which can be further processed or used by other tools.
 
 # Full listing of src/process/project_to_text.py
-```{'python'}
+```python
 
 ```
 <br>
@@ -58,7 +39,7 @@ This script provides a flexible and extensible solution for extracting text from
 ---
 ### Automatically generated Documentation for `doc-buddy/src/process/project_to_text.py`
 This documentation is generated automatically from the source code. Do not edit this file directly.
-Generated by **Doc-Buddy** on **November 09, 2024 18:54:43** via **gemini-1.5-pro-002**
+Generated by **Doc-Buddy** on **November 09, 2024 19:46:12** via **gemini-1.5-pro-002**
 
 For more information, visit the [Doc-Buddy on GitHub](https://github.com/scott-r-lindsey/doc-buddy).  
-*doc-buddy Commit Hash: e4f5dcb09e20896907179c4446f269d9f1c93dd8*
+*doc-buddy Commit Hash: b01f9573f01b626efe9b415f7392e374029af615*
