@@ -54,12 +54,12 @@ def generate_doc(file_path: Path, provider):
             # Document the file using the provider
             documentation += provider.document_file(
                 file_name=basename(file_path),
-                project_path=(file_path.parent),
+                project_path=(relative_path.parent),
                 file_contents=file_contents,
             )
 
             if documentation:
-                footer = generate_footer(basename(relative_path))
+                footer = generate_footer(relative_path)
                 documentation += generate_code_block(file_contents, relative_path)
                 documentation += footer
 
@@ -88,8 +88,10 @@ def generate_doc(file_path: Path, provider):
         )
 
 def generate_preface(file_path: Path):
-    block = f"# AI Generated documentation for {file_path}\n"
-    block += f"---\n"
+    block = ""
+    block += f"[<< Table of Contents](../{'../' * (len(file_path.parts) -2)}index.md)\n\n"
+    block += f"# AI Generated documentation for `{config.project_name}/{file_path}`\n"
+    block += "---\n"
 
     return block
 
@@ -99,7 +101,7 @@ def generate_code_block(code: str, file_name):
     """
     language = guess_language_for_markdown(file_name)
 
-    block = f"# Full listing of {file_name}\n"
+    block = f"\n# Full listing of {file_name}\n"
     block += f"```{language}\n{code}\n```\n"
 
     return block

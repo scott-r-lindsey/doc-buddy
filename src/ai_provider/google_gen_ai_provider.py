@@ -4,7 +4,6 @@ This module provides an AI provider for interacting with the Google GenAI API.
 
 import os
 import google.generativeai as genai
-from config import config
 from .ai_provider import AIProvider
 
 
@@ -36,6 +35,7 @@ class GoogleGenAIProvider(AIProvider):
         Returns:
             str: The generated documentation for the file.
         """
+        from config import config
 
         prompt = self.generate_prompt(file_name, project_path, file_contents)
 

@@ -26,17 +26,19 @@ class AIProvider(ABC):
         Generate a prompt for the user to provide documentation for a file.
         :return: The prompt.
         """
+        from config import config
 
         custom_prompt_template = os.getenv("AI_PROMPT")
 
         # Default prompt if no custom prompt is provided
         default_prompt = (
-            f"Please create a document which explains the following file:\n\n"
-            f"File Path: {project_path}/{file_name}\n\n"
-            f"File Contents:\n{file_contents}\n\n"
+            f"Please create a document which explains the following file:\n"
+            f"File Path: {project_path}/{file_name}\n"
+            f"Project Name: {config.project_name}\n"
             f"Make sure to include explanations for all functions, classes, and key"
-            f" logic in the file."
-            f" Do not wrap the output in a code block."
+            f" logic in the file. Do not wrap the output in a code block.\n\n"
+            f"Do not start your document with a heading; one will automatically be added.\n"
+            f"File Contents:\n{file_contents}\n\n"
         )
 
         # If a custom prompt template is provided, use it with variable substitution

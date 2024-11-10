@@ -66,7 +66,7 @@ To make `doc-buddy` available globally on your system without needing to be in t
 Once this is done, you can run `doc-buddy` from anywhere on your system:
 
 ```bash
-doc-buddy /path/to/file.js
+doc-buddy /path/to/file.js /path/to/docs/folder/
 ```
 
 ## Usage
@@ -78,10 +78,10 @@ Before running `doc-buddy`, make sure you are at the root of your repository, as
 To document a single file:
 
 ```bash
-doc-buddy ./some-file.py
+doc-buddy ./some-file.py ./docs
 ```
 
-This will generate the documentation in a new file next to the target file, with the suffix `-apidoc.md` (e.g., `some-file.js-apidoc.md`).
+This will generate the documentation in a new file n the folder `docs`, with the suffix `.md` (e.g., `some-file.js.md`).
 
 ### Documenting a Directory
 
@@ -89,10 +89,10 @@ To document all files of certain types within a directory:
 
 ```bash
 cd my-repo
-doc-buddy ./ --file-types py js jsx
+doc-buddy ./ ./docs --file-types py js jsx
 ```
 
-This will process all `.py`, `.js`, and `.jsx` files recursively in the directory and generate corresponding `-apidoc.md` files.
+This will process all `.py`, `.js`, and `.jsx` files recursively in the directory and generate corresponding markdown files in the `docs` folder.
 
 ### Dry Run
 
@@ -100,10 +100,14 @@ To perform a dry run (i.e., preview the files that would be processed):
 
 ```bash
 cd my-repo
-doc-buddy ./ --file-types py js jsx --dry-run
+doc-buddy ./ ./docs --file-types py js jsx --dry-run
 ```
 
 This will list the files that would have been documented without actually generating any documentation.
+
+## Doc-Buddy generated Documentation for Doc-Buddy
+
+Naturally, the code for doc-buddy has been documented with doc-buddy in the [docs folder](./docs/index.md).
 
 ## Contributing
 

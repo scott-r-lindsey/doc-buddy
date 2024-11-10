@@ -1,52 +1,97 @@
-## Documentation for `/var/www/html/scott/doc-buddy/src/ai_provider/ai_provider.py`
+[<< Table of Contents](../../index.md)
 
-This file defines the `AIProvider` abstract base class, which serves as a blueprint for integrating different AI providers into a documentation generation system (likely the "doc-buddy" application).  It establishes a common interface for interacting with various AI services, allowing for easy extensibility and interchangeability.
+# AI Generated documentation for `doc-buddy/src/ai_provider/ai_provider.py`
+---
+## src/ai_provider/ai_provider.py
 
-**Key Logic and Concepts:**
+This file defines the base structure for interacting with different AI providers for documentation generation within the `doc-buddy` project.  It uses abstract methods to ensure that specific provider implementations adhere to a common interface.
 
-* **Abstract Base Class (ABC):** The `AIProvider` class inherits from `abc.ABC`, signifying that it's an abstract class. This means it cannot be instantiated directly. Instead, concrete subclasses must be created, implementing the abstract methods defined within `AIProvider`. This enforces a consistent structure for all AI provider integrations.
+### `AIProvider` Class
 
-* **Provider Agnostic Design:** The use of an abstract base class promotes a provider-agnostic design.  The core application logic can interact with any AI provider through the common interface defined by `AIProvider`, without needing to know the specifics of each individual provider.
+This abstract base class serves as a blueprint for all AI providers.  It enforces the implementation of the `document_file` method in derived classes.
 
-* **Dependency Injection:** This design facilitates dependency injection.  The application can be configured to use different AI providers without modifying its core code, simply by injecting the appropriate concrete `AIProvider` implementation.
+#### `document_file(file_name: str, project_path: str, file_contents: str)`
 
-* **Environmental Configuration:** The `generate_prompt` method leverages environment variables.  The `AI_PROMPT` environment variable allows users to customize the prompt template used for documentation generation. This provides flexibility and avoids hardcoding prompts within the code.
+This abstract method is the core functionality of any AI provider.  It's responsible for taking the file's name, project path, and content as input and using an AI to generate documentation.  The specific implementation of how the AI is used and how the documentation is generated is left to the concrete provider classes that inherit from this base class.  The method is expected to return a document ID, which likely refers to a unique identifier for the generated documentation within the specific AI provider's system.
+
+#### `generate_prompt(file_name: str, project_path: str, file_contents: str)`
+
+This method constructs the prompt that will be sent to the AI. It allows for customization via an environment variable `AI_PROMPT`.
+
+- It first checks for the existence of a custom prompt template defined in the `AI_PROMPT` environment variable.
+
+- If a custom prompt template is found, it formats the template using the provided `file_name`, `project_path`, and `file_contents`. This allows users to define complex prompt structures and inject specific variables.
+
+- If no custom prompt is defined, it uses a default prompt.  The default prompt instructs the AI to create documentation for the specified file, including explanations for functions, classes, and key logic.  It also provides specific instructions about formatting: no code blocks and no initial heading.
+
+- The method returns the generated prompt, ready to be sent to an AI provider. It retrieves the `project_name` from a `config` object (presumably defined in a separate `config.py` file). This approach allows for centralized project configuration.
+
+# Full listing of src/ai_provider/ai_provider.py
+```{'python'}
+"""
+This file contains the base class for an AI provider.
+"""
+
+import os
+from abc import ABC, abstractmethod
 
 
-**Classes:**
+class AIProvider(ABC):
+    """
+    Base class for an AI provider. Extend this class to add support for other providers.
+    """
 
-* **`AIProvider`:** The abstract base class for all AI providers.
+    @abstractmethod
+    def document_file(self, file_name: str, project_path: str, file_contents: str):
+        """
+        Document a file.
+        :param file_name: The name of the file.
+        :param project_path: The path to the project.
+        :param file_contents: The contents of the file.
+        :return: The document ID.
+        """
 
-    * **`document_file(self, file_name: str, project_path: str, file_contents: str)`:**  An abstract method. Subclasses *must* implement this method to handle the actual documentation process. It receives the file name, project path, and file contents as input and is expected to return a document ID (the nature of which will depend on the specific AI provider).
+    def generate_prompt(self, file_name: str, project_path: str, file_contents: str):
+        """
+        Generate a prompt for the user to provide documentation for a file.
+        :return: The prompt.
+        """
+        from config import config
 
-    * **`generate_prompt(self, file_name: str, project_path: str, file_contents: str)`:**  Generates the prompt sent to the AI model.  It uses a customizable prompt template defined by the `AI_PROMPT` environment variable. If this variable is not set, it defaults to a comprehensive prompt requesting documentation for the provided file, including explanations of functions, classes, and key logic.  This method utilizes string formatting to inject the file name, project path, and file contents into the prompt template.
+        custom_prompt_template = os.getenv("AI_PROMPT")
 
+        # Default prompt if no custom prompt is provided
+        default_prompt = (
+            f"Please create a document which explains the following file:\n"
+            f"File Path: {project_path}/{file_name}\n"
+            f"Project Name: {config.project_name}\n"
+            f"Make sure to include explanations for all functions, classes, and key"
+            f" logic in the file. Do not wrap the output in a code block.\n\n"
+            f"Do not start your document with a heading; one will automatically be added.\n"
+            f"File Contents:\n{file_contents}\n\n"
+        )
 
-**Example Usage (Illustrative):**
+        # If a custom prompt template is provided, use it with variable substitution
+        if custom_prompt_template:
+            prompt = custom_prompt_template.format(
+                file_name=file_name,
+                project_path=project_path,
+                file_contents=file_contents,
+            )
+        else:
+            prompt = default_prompt
 
-```python
-# Assuming a concrete subclass 'OpenAIProvider' inheriting from AIProvider
+        return prompt
 
-provider = OpenAIProvider()  # Instantiate a concrete provider
-document_id = provider.document_file("my_file.py", "/path/to/project", "def my_function(): ...")
 ```
-
-
-**Key Improvements and Considerations:**
-
-* **Error Handling:** The `document_file` method in subclasses should implement robust error handling to gracefully manage potential issues during interaction with the AI provider (e.g., network errors, API rate limits).
-
-* **Return Type Hinting:** While `document_file` doesn't currently specify a return type annotation beyond the document ID string,  consider adding more specific type hinting (e.g., `-> str | None`) to improve code clarity and maintainability.
-
-* **Prompt Engineering Considerations:**  The default prompt is a good starting point, but further refinement might be necessary depending on the complexity of the code and the specific AI model used. Consider adding instructions related to code style, desired output format, or specific documentation frameworks (e.g., docstrings).
-
-
-This documentation provides a comprehensive explanation of the `ai_provider.py` file, its purpose, and its key components.  It also offers suggestions for potential improvements and considerations for future development.
+<br>
+<br>
 
 
 ---
-# Auto-generated Documentation for ai_provider.py
+### Automatically generated Documentation for `doc-buddy/src/ai_provider/ai_provider.py`
 This documentation is generated automatically from the source code. Do not edit this file directly.
-Generated by Doc-Buddy on 2024-11-09 11:28:26
+Generated by **Doc-Buddy** on **November 09, 2024 18:51:27** via **gemini-1.5-pro-002**
 
-Git Hash: <built-in method strip of str object at 0x7fbac58ef8d0>
+For more information, visit the [Doc-Buddy on GitHub](https://github.com/scott-r-lindsey/doc-buddy).  
+*doc-buddy Commit Hash: e4f5dcb09e20896907179c4446f269d9f1c93dd8*

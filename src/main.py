@@ -52,8 +52,8 @@ def main(input_path: Path, dry_run: bool, summary: bool) -> None:
 
             else:
                 # If it's a directory, document all files in it
-                # for file in files:
-                #     generate_doc(file, provider)
+                for file in files:
+                    generate_doc(file, provider)
 
                 # Generate table of contents
                 generate_toc(files)

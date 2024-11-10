@@ -4,7 +4,6 @@ This module provides an AI provider for interacting with the OpenAI API.
 
 import os
 import openai
-from config import config
 from .ai_provider import AIProvider
 
 
@@ -37,9 +36,7 @@ class OpenAIProvider(AIProvider):
         Returns:
             str: The generated documentation for the file.
         """
-
-        # Source the OpenAI model and custom prompt from environment variables
-        openai_model = config.model
+        from config import config
 
         prompt = self.generate_prompt(file_name, project_path, file_contents)
 
@@ -55,7 +52,7 @@ class OpenAIProvider(AIProvider):
         try:
             # Use the newer OpenAI chat completions API with raw response
             response = openai.chat.completions.with_raw_response.create(
-                model=openai_model,
+                model=config.model,
                 messages=messages,
                 max_tokens=4096,
                 temperature=0.7,

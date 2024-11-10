@@ -1,81 +1,115 @@
-## Documentation for `/var/www/html/scott/doc-buddy/src/util.py`
+[<< Table of Contents](../index.md)
 
-This module provides utility functions for the `doc-buddy` application, primarily focusing on file handling and initializing AI providers.
+# AI Generated documentation for `doc-buddy/src/util.py`
+---
+# src/util.py
 
-### Functions
+This module provides utility functions for the `doc-buddy` project, handling file operations and initializing AI providers.
 
-#### `get_absolute_path(file_path: str)`
+## Functions
 
-This function resolves the absolute path of a given file path. It handles cases where the execution environment might have a custom working directory defined by the `USER_CWD` environment variable.
+### `get_absolute_path(file_path: str)`
 
-* **`file_path: str`**: The relative or absolute file path to resolve.
-* **Returns**: A `pathlib.Path` object representing the absolute path.
+This function resolves the absolute path of a given file path.  It prioritizes the `USER_CWD` environment variable. If `USER_CWD` is set, the function uses it as the base directory to resolve the `file_path`. Otherwise, it resolves the `file_path` relative to the current working directory. This allows flexibility in specifying file paths, either relative to a user-specified directory or the current execution context. The function returns a `Path` object representing the absolute path.
 
-**Logic:**
+### `read_file(file_path: str, dry_run=False)`
 
-1. Checks if the `USER_CWD` environment variable is set.
-2. If set, it uses this variable's value as the base directory and appends the given `file_path` to it.
-3. If `USER_CWD` is not set, it resolves the `file_path` directly from the current working directory.
-4. Returns the resolved absolute path as a `pathlib.Path` object.
+This function reads and prints the content of a file. It takes the `file_path` as input and an optional `dry_run` flag. If `dry_run` is True, the function only prints the absolute path of the file without actually reading its contents.  This is useful for testing or previewing the actions without modifying any data. In a non-dry-run scenario, it opens the file in read mode (`"r"`) with UTF-8 encoding and prints its content to the console.  It includes error handling for `FileNotFoundError` and other potential exceptions during file operations. The function utilizes `get_absolute_path` to determine the absolute file path before attempting to open the file.
 
+### `initialize_provider()`
 
-#### `read_file(file_path: str, dry_run=False)`
+This function initializes the AI provider based on the `AI_PROVIDER` environment variable. It supports "GOOGLE-GEMINI", "GOOGLE-VERTEXAI", and "OPENAI" providers.  The function retrieves the value of `AI_PROVIDER`, converts it to uppercase, and then checks it against the supported provider names.  Based on the environment variable's value, it instantiates the corresponding provider class (e.g., `GoogleGenAIProvider`, `VertexAIProvider`, or `OpenAIProvider`). It prints an informative message indicating the selected provider. If the `AI_PROVIDER` environment variable is not set or contains an unsupported value, it prints an error message and exits the program with a status code of 1, indicating an error.  The function returns the initialized AI provider object.
 
-Reads and prints the content of a file.  Includes a `dry_run` option for testing.
+# Full listing of src/util.py
+```{'python'}
+"""
+This module contains utility functions that are used by the main script.
+"""
 
-* **`file_path: str`**: The path to the file to read.
-* **`dry_run=False`**:  If `True`, the function only prints the absolute path of the file it *would* read, without actually opening or reading the file's contents. This is useful for debugging and testing.
-* **Returns**: `None`. Prints the file content to the console if `dry_run` is `False`.
-
-**Logic:**
-
-1. Calls `get_absolute_path()` to resolve the absolute file path.
-2. If `dry_run` is `True`, it prints the absolute path and returns.
-3. If `dry_run` is `False`, it attempts to open the file in read mode (`"r"`) with UTF-8 encoding.
-4. Prints the entire file content to the console.
-5. Handles `FileNotFoundError` and other potential exceptions during file operations, printing informative error messages.
+import os
+import sys
+from pathlib import Path
+from ai_provider.open_ai_provider import OpenAIProvider
+from ai_provider.google_gen_ai_provider import GoogleGenAIProvider
+from ai_provider.vertexai_ai_provider import VertexAIProvider
 
 
-#### `initialize_provider()`
+def get_absolute_path(file_path: str):
+    """
+    Returns the absolute path of the file, taking into account the USER_CWD
+    environment variable.  If USER_CWD is set, it uses that as the base
+    directory; otherwise, it resolves the file path from the current working
+    directory.
+    """
+    user_cwd = os.getenv("USER_CWD")
 
-Initializes the AI provider based on the `AI_PROVIDER` environment variable.
+    if user_cwd:
+        base_path = Path(user_cwd).resolve()
+        absolute_path = (base_path / file_path).resolve()
+    else:
+        absolute_path = Path(file_path).resolve()
 
-* **Returns**: An instance of the chosen AI provider (e.g., `OpenAIProvider`, `GoogleGenAIProvider`, `VertexAIProvider`).  If the `AI_PROVIDER` environment variable is not set or contains an invalid value, the function prints an error message and exits the program.
-
-**Logic:**
-
-1. Retrieves the value of the `AI_PROVIDER` environment variable and converts it to uppercase.
-2. Uses a series of `if/elif/else` statements to check the value of `AI_PROVIDER`.
-3. Based on the value, it initializes and returns an instance of the corresponding provider class:
-    * `GOOGLE-GEMINI`: `GoogleGenAIProvider`
-    * `GOOGLE-VERTEXAI`: `VertexAIProvider`
-    * `OPENAI`: `OpenAIProvider`
-4. If the `AI_PROVIDER` is not set to one of the expected values, it prints an error message and exits the program with a status code of 1, indicating an error.
-
-
-### Dependencies
-
-The module depends on the following external libraries:
-
-* `os`:  For interacting with the operating system, specifically environment variables.
-* `sys`: For interacting with the Python runtime environment, specifically for exiting the program.
-* `pathlib`: For working with file paths in a platform-independent manner.
-* `ai_provider.open_ai_provider`:  Module containing the `OpenAIProvider` class.
-* `ai_provider.google_gen_ai_provider`: Module containing the `GoogleGenAIProvider` class.
-* `ai_provider.vertexai_ai_provider`: Module containing the `VertexAIProvider` class.
+    return absolute_path
 
 
-### Usage
+def read_file(file_path: str, dry_run=False):
+    """
+    Reads the content of the file at the given path.
+    If the dry_run flag is set, it only prints the file path and does not read the file.
+    """
+    # Get the absolute path using the separate function
+    absolute_path = get_absolute_path(file_path)
 
-This module is likely imported and used by other scripts in the `doc-buddy` application. The functions provided here handle common tasks like file path resolution, reading files, and initializing AI providers. This helps keep the main application logic cleaner and more organized.
+    if dry_run:
+        print(f"Dry run: Would read file '{absolute_path}'")
+        return
+
+    try:
+        with open(absolute_path, "r", encoding="utf-8") as file:
+            content = file.read()
+            print(content)
+
+    except FileNotFoundError:
+        print(f"Error: File '{absolute_path}' not found.")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
-This documentation provides a comprehensive overview of the `util.py` module.  It explains the purpose of each function and class, along with its parameters, return values, and key logic. It also clarifies the module's dependencies and provides insights into its general usage within the larger application.
+def initialize_provider():
+    """
+    Initialize the AI provider.
+    """
+
+    provider_name = os.getenv("AI_PROVIDER").upper()
+
+    # should work uppercase and lowercase, convert to uppercase
+    if provider_name == "GOOGLE-GEMINI":
+        print("-> Using Google Gemini AI provider")
+        provider = GoogleGenAIProvider()
+
+    elif provider_name == "GOOGLE-VERTEXAI":
+        print("-> Using Google Vertex AI provider")
+        provider = VertexAIProvider()
+
+    elif provider_name == "OPENAI":
+        print("-> Using OpenAI provider")
+        provider = OpenAIProvider()
+
+    else:
+        print("Error: AI provider not found.")
+        sys.exit(1)
+
+    return provider
+
+```
+<br>
+<br>
 
 
 ---
-# Auto-generated Documentation for util.py
+### Automatically generated Documentation for `doc-buddy/src/util.py`
 This documentation is generated automatically from the source code. Do not edit this file directly.
-Generated by Doc-Buddy on 2024-11-09 11:33:15
+Generated by **Doc-Buddy** on **November 09, 2024 18:54:55** via **gemini-1.5-pro-002**
 
-Git Hash: <built-in method strip of str object at 0x7fbac58efdb0>
+For more information, visit the [Doc-Buddy on GitHub](https://github.com/scott-r-lindsey/doc-buddy).  
+*doc-buddy Commit Hash: e4f5dcb09e20896907179c4446f269d9f1c93dd8*
