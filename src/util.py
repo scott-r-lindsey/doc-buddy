@@ -60,15 +60,15 @@ def initialize_provider():
 
     # should work uppercase and lowercase, convert to uppercase
     if provider_name == "GOOGLE-GEMINI":
-        print("Using Google Gemini AI provider")
+        print("-> Using Google Gemini AI provider")
         provider = GoogleGenAIProvider()
 
     elif provider_name == "GOOGLE-VERTEXAI":
-        print("Using Vertex AI provider")
+        print("-> Using Google Vertex AI provider")
         provider = VertexAIProvider()
 
     elif provider_name == "OPENAI":
-        print("Using OpenAI provider")
+        print("-> Using OpenAI provider")
         provider = OpenAIProvider()
 
     else:

@@ -4,6 +4,7 @@ This module provides an AI provider for interacting with the Google GenAI API.
 
 import os
 import google.generativeai as genai
+from config import config
 from .ai_provider import AIProvider
 
 
@@ -40,7 +41,7 @@ class GoogleGenAIProvider(AIProvider):
 
         # Prepare the request payload for the chat API
         try:
-            model = genai.GenerativeModel(os.getenv("GOOGLE_GEM_MODEL"))
+            model = genai.GenerativeModel(config.model)
 
             response = model.generate_content(prompt)
 

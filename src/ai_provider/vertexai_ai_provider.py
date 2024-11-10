@@ -4,6 +4,7 @@ This module provides an implementation of the AIProvider interface using the Ver
 
 import os
 import vertexai
+from config import config
 from vertexai.preview.generative_models import GenerativeModel
 from .ai_provider import AIProvider
 
@@ -15,9 +16,8 @@ class VertexAIProvider(AIProvider):
 
     def __init__(self):
         required_env_vars = {
-            'GOOGLE_VERTEXAI_PROJECT': 'Google Cloud project ID',
-            'GOOGLE_VERTEXAI_LOCATION': 'Vertex AI location',
-            'GOOGLE_VERTEXAI_MODEL': 'Model name'
+            "GOOGLE_VERTEXAI_PROJECT": "Google Cloud project ID",
+            "GOOGLE_VERTEXAI_LOCATION": "Vertex AI location",
         }
 
         missing_vars = [var for var in required_env_vars if var not in os.environ]
@@ -27,12 +27,12 @@ class VertexAIProvider(AIProvider):
                 f"{', '.join(f'{var} ({required_env_vars[var]})' for var in missing_vars)}"
             )
 
-        project_id = os.environ['GOOGLE_VERTEXAI_PROJECT']
-        region = os.environ['GOOGLE_VERTEXAI_LOCATION']
+        project_id = os.environ["GOOGLE_VERTEXAI_PROJECT"]
+        region = os.environ["GOOGLE_VERTEXAI_LOCATION"]
         vertexai.init(project=project_id, location=region)
 
-        if not hasattr(self, '_model'):
-            self._model = GenerativeModel(os.environ['GOOGLE_VERTEXAI_MODEL'])
+        if not hasattr(self, "_model"):
+            self._model = ""
 
     def document_file(self, file_name, project_path, file_contents):
         """
@@ -48,6 +48,9 @@ class VertexAIProvider(AIProvider):
             str: The generated documentation for the file.
 
         """
+
+        if self._model is None or self._model == "":
+            self._model = GenerativeModel(config.model)
 
         prompt = self.generate_prompt(file_name, project_path, file_contents)
 

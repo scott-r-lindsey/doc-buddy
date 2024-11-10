@@ -508,24 +508,6 @@ grpc = ["grpcio (>=1.38.0,<2.0dev)", "grpcio-status (>=1.38.0,<2.0.dev0)"]
 
 [[package]]
 name = "google-cloud-resource-manager"
-version = "1.12.5"
-description = "Google Cloud Resource Manager API client library"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "google_cloud_resource_manager-1.12.5-py2.py3-none-any.whl", hash = "sha256:2708a718b45c79464b7b21559c701b5c92e6b0b1ab2146d0a256277a623dc175"},
-    {file = "google_cloud_resource_manager-1.12.5.tar.gz", hash = "sha256:b7af4254401ed4efa3aba3a929cb3ddb803fa6baf91a78485e45583597de5891"},
-]
-
-[package.dependencies]
-google-api-core = {version = ">=1.34.1,<2.0.dev0 || >=2.11.dev0,<3.0.0dev", extras = ["grpc"]}
-google-auth = ">=2.14.1,<2.24.0 || >2.24.0,<2.25.0 || >2.25.0,<3.0.0dev"
-grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
-proto-plus = ">=1.22.3,<2.0.0dev"
-protobuf = ">=3.20.2,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<6.0.0dev"
-
-[[package]]
-name = "google-cloud-resource-manager"
 version = "1.13.0"
 description = "Google Cloud Resource Manager API client library"
 optional = false
@@ -539,7 +521,10 @@ files = [
 google-api-core = {version = ">=1.34.1,<2.0.dev0 || >=2.11.dev0,<3.0.0dev", extras = ["grpc"]}
 google-auth = ">=2.14.1,<2.24.0 || >2.24.0,<2.25.0 || >2.25.0,<3.0.0dev"
 grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
-proto-plus = {version = ">=1.22.3,<2.0.0dev", markers = "python_version < \"3.13\""}
+proto-plus = [
+    {version = ">=1.22.3,<2.0.0dev", markers = "python_version < \"3.13\""},
+    {version = ">=1.25.0,<2.0.0dev", markers = "python_version >= \"3.13\""},
+]
 protobuf = ">=3.20.2,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<6.0.0dev"
 
 [[package]]
@@ -1071,13 +1056,13 @@ type = ["mypy (>=1.11.2)"]
 
 [[package]]
 name = "proto-plus"
-version = "1.24.0"
+version = "1.25.0"
 description = "Beautiful, Pythonic protocol buffers."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "proto-plus-1.24.0.tar.gz", hash = "sha256:30b72a5ecafe4406b0d339db35b56c4059064e69227b8c3bda7462397f966445"},
-    {file = "proto_plus-1.24.0-py3-none-any.whl", hash = "sha256:402576830425e5f6ce4c2a6702400ac79897dab0b4343821aa5188b0fab81a12"},
+    {file = "proto_plus-1.25.0-py3-none-any.whl", hash = "sha256:c91fc4a65074ade8e458e95ef8bac34d4008daa7cce4a12d6707066fca648961"},
+    {file = "proto_plus-1.25.0.tar.gz", hash = "sha256:fbb17f57f7bd05a68b7707e745e26528b0b3c34e378db91eef93912c54982d91"},
 ]
 
 [package.dependencies]
@@ -1254,6 +1239,26 @@ files = [
 
 [package.dependencies]
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
+
+[[package]]
+name = "pydantic-settings"
+version = "2.6.0"
+description = "Settings management using Pydantic"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pydantic_settings-2.6.0-py3-none-any.whl", hash = "sha256:4a819166f119b74d7f8c765196b165f95cc7487ce58ea27dec8a5a26be0970e0"},
+    {file = "pydantic_settings-2.6.0.tar.gz", hash = "sha256:44a1804abffac9e6a30372bb45f6cafab945ef5af25e66b1c634c01dd39e0188"},
+]
+
+[package.dependencies]
+pydantic = ">=2.7.0"
+python-dotenv = ">=0.21.0"
+
+[package.extras]
+azure-key-vault = ["azure-identity (>=1.16.0)", "azure-keyvault-secrets (>=4.8.0)"]
+toml = ["tomli (>=2.0.1)"]
+yaml = ["pyyaml (>=6.0.1)"]
 
 [[package]]
 name = "pylint"
@@ -1563,4 +1568,4 @@ xai = ["tensorflow (>=2.3.0,<3.0.0dev)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "fcf997e305a39acbda355f20e435ec397d2e630d2c287aa40bb6a00426bc10d3"
+content-hash = "0cd8561bacea0fe7a9826c2f5a1448a6a6def4e531b031a3cc45c295c55dce23"

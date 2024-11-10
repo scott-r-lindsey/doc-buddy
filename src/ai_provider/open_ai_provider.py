@@ -4,6 +4,7 @@ This module provides an AI provider for interacting with the OpenAI API.
 
 import os
 import openai
+from config import config
 from .ai_provider import AIProvider
 
 
@@ -38,9 +39,7 @@ class OpenAIProvider(AIProvider):
         """
 
         # Source the OpenAI model and custom prompt from environment variables
-        openai_model = os.getenv(
-            "OPENAI_MODEL", "gpt-4o"
-        )  # Default to "gpt-4o" if not set
+        openai_model = config.model
 
         prompt = self.generate_prompt(file_name, project_path, file_contents)
 
