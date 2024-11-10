@@ -38,7 +38,6 @@ def get_git_repo_files(repo_path: Path, folder_path: Path = None):
 
     :param repo_path: Path to the root of the git repository.
     :param folder_path: Specific folder within the repository to list files from.
-    :param extensions: List of file extensions to filter by (e.g., ['.py', '.txt']).
     :return: A list of file paths relative to the root of the repository.
     """
     try:

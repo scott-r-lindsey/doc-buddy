@@ -45,15 +45,15 @@ def main(input_path: Path, dry_run: bool, summary: bool) -> None:
         elif input_path.is_dir():
             files = find_files()
 
-            if config.dry_run:
+            if dry_run:
                 print("Dry run enabled. No files will be created.")
                 print("Files to be processed:")
                 print(render_tree(files))
 
             else:
                 # If it's a directory, document all files in it
-                # for file in files:
-                #     generate_doc(file, provider)
+                for file in files:
+                    generate_doc(file, provider)
 
                 # Generate table of contents
                 generate_toc(files)

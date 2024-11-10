@@ -29,8 +29,9 @@ class Config(BaseModel):
     summary: bool = False
     gitmode: bool = False
     provider: str
-    model: str
+    model: str = ""
     documentation_suffix: str = ".md"
+    project_name: str = ""
 
     def __init__(self):
         user_cwd = Path(os.getenv("USER_CWD", os.getcwd()))
@@ -51,7 +52,7 @@ class Config(BaseModel):
             Path(args.output_path).resolve() if (args.output_path is not None) else None
         )
 
-        gitmode, root_path = self.find_gitmode(input_path, user_cwd)
+        gitmode, root_path, project_name = self.find_gitmode(input_path, user_cwd)
 
         file_types = args.file_types if args.file_types is not None else []
         dry_run = args.dry_run if args.dry_run is not None else False
@@ -67,6 +68,8 @@ class Config(BaseModel):
             summary=summary,
             gitmode=gitmode,
             provider=provider,
+            model=model,
+            project_name=project_name,
             documentation_suffix=documentation_suffix,
         )
 
@@ -132,7 +135,9 @@ class Config(BaseModel):
         else:
             print(f"-> No Git root found, using {root_path}")
 
-        return gitmode, root_path
+        project_name = root_path.name
+
+        return gitmode, root_path, project_name
 
 
 # Create a global config instance to be shared across all modules

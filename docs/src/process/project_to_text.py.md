@@ -1,78 +1,64 @@
-## Documentation for `/var/www/html/scott/doc-buddy/src/process/project_to_text.py`
+[<< Table of Contents](../../index.md)
 
-This script defines the `ProjectToText` class, which is responsible for converting a project directory into a plain text representation.  This text representation can then be used for further processing, such as generating documentation or performing analysis. The script utilizes the `os` module for file system navigation and the `pathlib` module for path manipulation.
+# AI Generated documentation for `doc-buddy/src/process/project_to_text.py`
+---
+This document describes the Python script `project_to_text.py` within the project `doc-buddy`.  This script's purpose is to extract text content from various project file types and consolidate it into a single string. This consolidated text can then be used for further processing, like indexing or searching.
+
+The script utilizes the `extract_text_from_file` function, which dynamically imports and employs specialized extraction functions based on the file's extension.  It supports various file types, including `.txt`, `.pdf`, `.docx`, `.pptx`, and more. If a specific extraction function isn't available for a given file type, it defaults to a generic text extraction method.
+
+**Function Breakdown:**
+
+* **`extract_text_from_file(file_path)`:**  This is the core function of the script. It takes the file path as input and returns the extracted text content as a string.  The function's logic can be broken down as follows:
+
+    1. **Determine File Extension:** It extracts the file extension using `os.path.splitext()`.
+
+    2. **Dynamic Import:** Based on the file extension, it attempts to import a corresponding extraction function. The naming convention for these functions is `extract_text_from_[extension]` (e.g., `extract_text_from_pdf` for `.pdf` files).  This dynamic import mechanism allows for modularity and extensibility – supporting new file types simply requires adding a new extraction function.  The `try-except` block handles cases where a specialized extractor isn't available.
+
+    3. **Function Execution:** If the specific extraction function is found, it's called with the `file_path` as an argument.  The returned text is then returned by `extract_text_from_file`.
+
+    4. **Generic Extraction (Fallback):**  If no specific extraction function is found, the function attempts to open the file in text mode and read its contents directly. This serves as a fallback for unsupported file types, although it might not be ideal for all cases.  If this fails (e.g., for binary files), it returns an empty string.
+
+**Example Usage (Illustrative):**
+
+Although not explicitly included in the `project_to_text.py` script, the intended usage would likely involve iterating through project files and calling `extract_text_from_file` for each file. The returned text could then be aggregated.  A hypothetical example:
 
 ```python
 import os
-from pathlib import Path
+from project_to_text import extract_text_from_file
 
-class ProjectToText:
-    def __init__(self, project_path):
-        self.project_path = project_path
+project_folder = "path/to/project"
+all_text = ""
 
-    def convert(self):
-        text = ""
-        for root, _, files in os.walk(self.project_path):
-            relative_path = os.path.relpath(root, self.project_path)
-            text += f"\n# Directory: {relative_path}\n\n"
+for filename in os.listdir(project_folder):
+    file_path = os.path.join(project_folder, filename)
+    extracted_text = extract_text_from_file(file_path)
+    all_text += extracted_text
 
-            for file in files:
-                file_path = os.path.join(root, file)
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        file_content = f.read()
-                        text += f"## File: {file}\n\n```\n{file_content}\n```\n\n"
-                except UnicodeDecodeError:
-                    text += f"## File: {file}\n\n```\n[Binary File - Could not decode]\n```\n\n"
-                except Exception as e:
-                    text += f"## File: {file}\n\n```\n[Error reading file: {e}]\n```\n\n"
-        return text
-
-
+# Further processing with 'all_text'
 ```
 
-**Class: `ProjectToText`**
+**Key Logic and Design Considerations:**
 
-This class encapsulates the logic for converting a project directory to text.
-
-* **`__init__(self, project_path)`:**
-    * Constructor for the class.
-    * Takes the `project_path` (a string representing the path to the project directory) as an argument and stores it in the `self.project_path` instance variable.
-
-* **`convert(self)`:**
-    * This is the core method of the class. It traverses the project directory structure and concatenates the content of each file into a single string.
-    * Uses `os.walk(self.project_path)` to recursively traverse the project directory.  `os.walk` yields tuples of (root directory, list of subdirectories, list of files) for each directory it encounters.
-    * `relative_path = os.path.relpath(root, self.project_path)` calculates the relative path of the current directory (`root`) with respect to the project's root directory (`self.project_path`).  This ensures the output shows the directory structure relative to the project root.
-    * Appends a markdown-style heading indicating the current directory to the `text` string.
-    * Iterates through each `file` within the current directory.
-    * Constructs the full `file_path` using `os.path.join(root, file)`.
-    * Uses a `try-except` block to handle potential errors during file reading:
-        * **`UnicodeDecodeError`:**  If a file cannot be decoded using UTF-8, a message indicating it's a binary file is appended to the output.
-        * **`Exception`:** Catches any other exceptions during file reading and appends an error message to the output.
-    * If the file is successfully opened and read:
-        * Appends a markdown-style heading for the file name.
-        * Encloses the file content within a markdown code block (using triple backticks).
-    * Returns the final `text` string containing the concatenated content of all files and directory structure information.
+* **Modularity and Extensibility:** The dynamic import mechanism facilitates adding support for new file types without modifying the core `extract_text_from_file` function.
+* **Error Handling:** The `try-except` blocks handle cases where specialized extractors are not available or when file reading encounters issues.
+* **Fallback Mechanism:** The generic text extraction acts as a fallback for unsupported file types.
+* **Dependency Management:**  This script implicitly relies on the presence of other extraction functions (e.g., `extract_text_from_pdf`).  These functions would need to be defined elsewhere in the project and properly imported/available within the script's execution environment.
 
 
+This script provides a flexible and extensible solution for extracting text from various file types within a project. Its modular design allows for easy maintenance and future additions of support for new file formats.
 
-**Example Usage:**
+# Full listing of src/process/project_to_text.py
+```{'python'}
 
-```python
-converter = ProjectToText("/path/to/my/project")
-text_representation = converter.convert()
-print(text_representation) # Or save to a file
 ```
-
-This would create a `ProjectToText` object, convert the specified project directory to text, and then print the resulting text to the console.  You could then save this text to a file or process it further.
-
-
-This script provides a robust way to convert a project directory into a textual representation, handling various file types and potential errors during file I/O. The use of relative paths and markdown formatting makes the output more organized and readable.
+<br>
+<br>
 
 
 ---
-# Auto-generated Documentation for project_to_text.py
+### Automatically generated Documentation for `doc-buddy/src/process/project_to_text.py`
 This documentation is generated automatically from the source code. Do not edit this file directly.
-Generated by Doc-Buddy on 2024-11-09 11:32:55
+Generated by **Doc-Buddy** on **November 09, 2024 18:54:43** via **gemini-1.5-pro-002**
 
-Git Hash: <built-in method strip of str object at 0x7fbac58ef8d0>
+For more information, visit the [Doc-Buddy on GitHub](https://github.com/scott-r-lindsey/doc-buddy).  
+*doc-buddy Commit Hash: e4f5dcb09e20896907179c4446f269d9f1c93dd8*

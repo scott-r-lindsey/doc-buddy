@@ -83,6 +83,7 @@ def render_tree_html(files, extension=""):
         return html_str
 
     html_output = '<pre style="font-family: monospace;">'
+    html_output += f"{config.project_name}<br>"
     html_output += build_html_string(tree)
     html_output += "</pre>"
     return html_output

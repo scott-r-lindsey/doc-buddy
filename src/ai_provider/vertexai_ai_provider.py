@@ -4,7 +4,6 @@ This module provides an implementation of the AIProvider interface using the Ver
 
 import os
 import vertexai
-from config import config
 from vertexai.preview.generative_models import GenerativeModel
 from .ai_provider import AIProvider
 
@@ -48,6 +47,7 @@ class VertexAIProvider(AIProvider):
             str: The generated documentation for the file.
 
         """
+        from config import config
 
         if self._model is None or self._model == "":
             self._model = GenerativeModel(config.model)
