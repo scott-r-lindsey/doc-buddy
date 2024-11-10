@@ -104,6 +104,8 @@ def generate_code_block(code: str, file_name):
     block = f"\n# Full listing of {file_name}\n"
     block += f"```{language}\n{code}\n```\n"
 
+    print(f"Language: {language}")
+
     return block
 
 
@@ -150,4 +152,4 @@ def guess_language_for_markdown(filename):
     }
 
     # Return the markdown language string if found, else return plain text
-    return {extension_mapping.get(extension, '')}
+    return extension_mapping.get(extension, '')
