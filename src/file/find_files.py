@@ -4,10 +4,12 @@ from pathlib import Path
 from config import config
 
 
-def find_files():
+def find_files(input_path: Path = None):
+
+    if input_path is None:
+        input_path = config.input_path
 
     gitmode = config.gitmode
-    input_path = config.input_path
     git_root = config.root_path
 
     if gitmode:

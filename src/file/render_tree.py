@@ -1,14 +1,14 @@
 import os
-from pathlib import Path
 from config import config
 
 
-def render_tree(files, markdown=False):
+def render_tree(files, markdown=False, include_size=False):
     """
     Renders the list of files as a tree structure, similar to the Unix 'tree' command.
 
     :param files: List of file paths to be rendered as a tree.
     :param markdown: Boolean indicating whether to render file names as Markdown links.
+    :param include_size: Boolean indicating whether to include the file size in bytes.
     :return: A string representing the tree structure.
     """
     tree = {}
@@ -30,11 +30,19 @@ def render_tree(files, markdown=False):
             is_last = index == len(keys) - 1
             prefix = "└── " if is_last else "├── "
             full_path = os.path.join(path, key)
+
+            # Determine if we need to add file size
+            size_str = ""
+            if include_size and not current[key]:  # Only files, not directories
+                file_size = os.path.getsize(full_path)
+                size_str = f" [{file_size} bytes]"
+
             if markdown and not current[key]:
                 # Render as markdown link if markdown is enabled and it's a file
-                tree_str += f"{indent}{prefix}[{key}]({full_path})\n"
+                tree_str += f"{indent}{prefix}[{key}]({full_path}){size_str}\n"
             else:
-                tree_str += f"{indent}{prefix}{key}\n"
+                tree_str += f"{indent}{prefix}{key}{size_str}\n"
+
             new_indent = indent + ("    " if is_last else "│   ")
             tree_str += build_tree_string(current[key], full_path, new_indent)
         return tree_str

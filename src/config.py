@@ -4,10 +4,9 @@ This module contains the Config class that is used to parse and store configurat
 
 import os
 import argparse
-from dotenv import load_dotenv
 from pathlib import Path
-from typing import Optional, List
-from util import get_absolute_path
+from typing import List
+from dotenv import load_dotenv
 from pydantic import BaseModel
 
 
@@ -32,6 +31,8 @@ class Config(BaseModel):
     model: str = ""
     documentation_suffix: str = ".md"
     project_name: str = ""
+    ai_prompt: str = ""
+    prompt_debug: bool = False
 
     def __init__(self):
         user_cwd = Path(os.getenv("USER_CWD", os.getcwd()))
@@ -42,6 +43,7 @@ class Config(BaseModel):
 
         provider = os.getenv("AI_PROVIDER", "")
         model = os.getenv("AI_MODEL", "")
+        ai_prompt = os.getenv("AI_PROMPT", "")
         documentation_suffix = os.getenv("DOCUMENTATION_SUFFIX", ".md")
 
         user_cwd = Path(os.getcwd())
@@ -57,6 +59,7 @@ class Config(BaseModel):
         file_types = args.file_types if args.file_types is not None else []
         dry_run = args.dry_run if args.dry_run is not None else False
         summary = args.summary if args.summary is not None else False
+        prompt_debug = args.prompt_debug if args.prompt_debug is not None else False
 
         super().__init__(
             input_path=input_path,
@@ -69,8 +72,10 @@ class Config(BaseModel):
             gitmode=gitmode,
             provider=provider,
             model=model,
+            ai_prompt=ai_prompt,
             project_name=project_name,
             documentation_suffix=documentation_suffix,
+            prompt_debug=prompt_debug,
         )
 
         # change to the project path
@@ -101,6 +106,11 @@ class Config(BaseModel):
             "--summary",
             action="store_true",
             help="Generate a summary of the entire project.",
+        )
+        parser.add_argument(
+            "--prompt-debug",
+            action="store_true",
+            help="Print the prompt for the AI model and exit.",
         )
 
         # Parsing the arguments
