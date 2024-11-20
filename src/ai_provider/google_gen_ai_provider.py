@@ -22,7 +22,9 @@ class GoogleGenAIProvider(AIProvider):
         api_key = os.getenv("GOOGLE_API_KEY")
         genai.configure(api_key=api_key)
 
-    def document_file(self, file_name, project_path, file_contents):
+    def document_file(
+        self, file_name, project_path, file_contents, notify_user_toast, tree
+    ):
         """
         Documents a file using the Google GenAI API by providing the file path,
         file name, and its contents.
@@ -31,13 +33,15 @@ class GoogleGenAIProvider(AIProvider):
             file_name (str): The name of the file to document.
             project_path (str): The project path where the file is located.
             file_contents (str): The contents of the file to be documented.
+            notify_user_toast (function): A function to notify the user with a toast message.
+            tree (QTreeWidget): The tree widget to update with the generated documentation
 
         Returns:
             str: The generated documentation for the file.
         """
         from config import config
 
-        prompt = self.generate_prompt(file_name, project_path, file_contents)
+        prompt = self.generate_prompt(file_name, project_path, file_contents, tree)
 
         # Prepare the request payload for the chat API
         try:
@@ -51,3 +55,10 @@ class GoogleGenAIProvider(AIProvider):
         except Exception as e:
             print(f"Error occurred while generating documentation: {e}")
             return None
+
+    @property
+    def function_block(self):
+        """
+        functions not implemented yet
+        """
+        return ""

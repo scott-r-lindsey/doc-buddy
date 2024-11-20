@@ -1,7 +1,3 @@
-"""
-This module contains the logic to document a single file.
-"""
-
 import os
 import sys
 import threading
@@ -10,22 +6,55 @@ from pathlib import Path
 from os.path import basename
 from config import config
 from .generate_footer import generate_footer
+from .generate_preface import generate_preface
+from .generate_code_block import generate_code_block
+
+done = False
+current_file = None
+messages = []
 
 
 def spinner():
     """
     Function to show a spinner while a task is running.
+    Displays any additional messages (e.g., LLM file requests).
     """
     spinner_chars = ["|", "/", "-", "\\"]
     idx = 0
+    last_message_count = 0  # Track the number of messages previously displayed
+
     while not done:
+        # If new messages have arrived, print them once
+        if len(messages) > last_message_count:
+            # Move cursor up and clear the line to remove the spinner
+            sys.stdout.write("\r\033[K")  # Clear the current line (spinner line)
+
+            # Print the new message
+            new_message = messages[last_message_count]
+            sys.stdout.write(f"{new_message}\n")
+
+            last_message_count += 1  # Update count of printed messages
+
+        # Always rewrite the spinner line at the bottom
         sys.stdout.write(f"\rDocumenting file {current_file} {spinner_chars[idx]}")
         sys.stdout.flush()
+
         idx = (idx + 1) % len(spinner_chars)
         time.sleep(0.1)
 
+    messages.clear()  # Clear any remaining messages
+    idx = 0
 
-def generate_doc(file_path: Path, provider):
+
+def notify_user_toast(message: str):
+    """
+    Function to add a message to the list that should be displayed to the user.
+    This allows the spinner to show messages without breaking the output format.
+    """
+    messages.append(message)
+
+
+def generate_doc(file_path: Path, provider, tree):
     """
     Document a single file and write the output to a file with suffix.
     """
@@ -56,6 +85,8 @@ def generate_doc(file_path: Path, provider):
                 file_name=basename(file_path),
                 project_path=(relative_path.parent),
                 file_contents=file_contents,
+                notify_user_toast=notify_user_toast,
+                tree=tree,
             )
 
             if documentation:
@@ -63,8 +94,10 @@ def generate_doc(file_path: Path, provider):
                 documentation += generate_code_block(file_contents, relative_path)
                 documentation += footer
 
-                output_file_path = config.output_path / relative_path.parent / (
-                    basename(relative_path) + suffix
+                output_file_path = (
+                    config.output_path
+                    / relative_path.parent
+                    / (basename(relative_path) + suffix)
                 )
 
                 # create the directory if it does not exist
@@ -86,70 +119,3 @@ def generate_doc(file_path: Path, provider):
         sys.stdout.write(
             f"\rDocumenting file {file_path} - {elapsed_time:.2f} seconds\n"
         )
-
-def generate_preface(file_path: Path):
-    block = ""
-    block += f"[<< Table of Contents](../{'../' * (len(file_path.parts) -2)}index.md)\n\n"
-    block += f"# AI Generated documentation for `{config.project_name}/{file_path}`\n"
-    block += "---\n"
-
-    return block
-
-def generate_code_block(code: str, file_name):
-    """
-    Generate a code block with a specific language.
-    """
-    language = guess_language_for_markdown(file_name)
-
-    block = f"\n# Full listing of {file_name}\n"
-    block += f"```{language}\n{code}\n```\n"
-
-    print(f"Language: {language}")
-
-    return block
-
-
-def guess_language_for_markdown(filename):
-    # Extract the file extension
-    _, extension = os.path.splitext(filename)
-    extension = extension.lower()
-
-    # Define a mapping of extensions to languages for markdown
-    extension_mapping = {
-        ".py": "python",
-        ".js": "javascript",
-        ".ts": "typescript",
-        ".html": "html",
-        ".css": "css",
-        ".java": "java",
-        ".c": "c",
-        ".cpp": "cpp",
-        ".cs": "csharp",
-        ".rb": "ruby",
-        ".php": "php",
-        ".sh": "bash",
-        ".bash": "bash",
-        ".zsh": "bash",
-        ".go": "go",
-        ".rs": "rust",
-        ".swift": "swift",
-        ".json": "json",
-        ".yaml": "yaml",
-        ".yml": "yaml",
-        ".xml": "xml",
-        ".sql": "sql",
-        ".kt": "kotlin",
-        ".m": "matlab",
-        ".r": "r",
-        ".pl": "perl",
-        ".dockerfile": "dockerfile",
-        ".ps1": "powershell",
-        ".vim": "vim",
-        ".lua": "lua",
-        ".scala": "scala",
-        ".hs": "haskell",
-        ".md": "markdown"
-    }
-
-    # Return the markdown language string if found, else return plain text
-    return extension_mapping.get(extension, '')

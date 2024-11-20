@@ -27,6 +27,9 @@ def main(input_path: Path, dry_run: bool, summary: bool) -> None:
     # Get the project directory from USER_CWD or fallback to current working directory
     project_path = os.getenv("USER_CWD", os.getcwd())
 
+    context_files = find_files(Path(project_path))
+    context_tree = render_tree(context_files, False, True)
+
     if summary:
         print("Generating summary...")
         print("Not implemented yet.")
@@ -34,26 +37,31 @@ def main(input_path: Path, dry_run: bool, summary: bool) -> None:
     else:
         if input_path.is_file():
             if dry_run:
-                print("- Dry run enabled. No files will be created.")
-                print(f"File to be processed: {input_path}")
+                print("-> Dry run enabled. No files will be created.")
+                print(f"-> Context contains {len(context_files)} files.")
+                print(f"-> File to be processed: {input_path}")
 
             else:
                 # If it's a single file, document it
-                generate_doc(input_path, provider)
+                print(f"-> Context contains {len(context_files)} files.")
+                print(f"-> Processing single file '{input_path}'")
+                generate_doc(input_path, provider, context_tree)
                 print("Done!")
 
         elif input_path.is_dir():
             files = find_files()
 
             if dry_run:
-                print("Dry run enabled. No files will be created.")
+                print("-> Dry run enabled. No files will be created.")
+                print(f"-> Context contains {len(context_files)} files.")
                 print("Files to be processed:")
                 print(render_tree(files))
 
             else:
-                # If it's a directory, document all files in it
+                print(f"-> Context tree contains {len(context_files)} files.")
+                print(f"-> Processing {len(files)} files...")
                 for file in files:
-                    generate_doc(file, provider)
+                    generate_doc(file, provider, context_tree)
 
                 # Generate table of contents
                 generate_toc(files)
