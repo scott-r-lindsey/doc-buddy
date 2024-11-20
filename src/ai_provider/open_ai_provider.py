@@ -54,9 +54,9 @@ class OpenAIProvider(AIProvider):
             {"role": "user", "content": prompt},
         ]
 
-        return self.get_competions(messages, notify_user_toast)
+        return self.get_completions(messages, notify_user_toast)
 
-    def get_competions(self, messages, notify_user_toast):
+    def get_completions(self, messages, notify_user_toast):
         from config import config
 
         tools = [
@@ -72,7 +72,7 @@ class OpenAIProvider(AIProvider):
                                 "type": "string",
                             },
                         },
-                        "required": ["file_paths"],
+                        "required": ["file_path"],
                         "additionalProperties": False,
                     },
                 },

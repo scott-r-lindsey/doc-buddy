@@ -92,31 +92,26 @@ class AIProvider(ABC):
 
         return prompt
 
-    # this will retrive each file in an array
-    def get_multiple_files(self, files: list):
-        """
-        Retrieve the contents of multiple files.
-        :param files: The list of file paths.
-        :return: The contents of the files.
-        """
-
-        # key / value pair of file name and file contents
-        file_contents = {}
-
-        try:
-            for file in files:
-                file_contents[file] = self.retrieve_file_contents(file)
-
-        except Exception as e:
-            print(f"Error: {e}")
-
-        return [self.retrieve_file_contents(file) for file in files]
-
     def retrieve_file_contents(self, file_path: str):
         """
         Retrieve the contents of a file.
         :param file_path: The path to the file.
         :return: The contents of the file.
         """
+        # validate the file path is relative
+        if not os.path.isabs(file_path):
+            raise ValueError("File path must be relative.")
+
+        # validate the file path does not contain ".."
+        if ".." in file_path:
+            raise ValueError("File path cannot contain '..'.")
+
+        # convert the file path to an absolute path
+        file_path = os.path.abspath(file_path)
+
+        # validate the file path is within the current directory
+        if not file_path.startswith(os.getcwd()):
+            raise ValueError("File path must be within the current directory.")
+
         with open(file_path, "r") as file:
             return file.read()
