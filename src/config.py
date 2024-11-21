@@ -23,6 +23,9 @@ class Config(BaseModel):
     # the path to the user's current working directory
     user_cwd: Path
 
+    # the path to doc-buddy
+    app_path: Path
+
     file_types: List[str]
     dry_run: bool = False
     summary: bool = False
@@ -38,6 +41,8 @@ class Config(BaseModel):
         user_cwd = Path(os.getenv("USER_CWD", os.getcwd()))
         load_dotenv()
         os.chdir(user_cwd)
+
+        app_path = Path(__file__).resolve().parent
 
         args = self.parse_args()
 
@@ -62,6 +67,7 @@ class Config(BaseModel):
         prompt_debug = args.prompt_debug if args.prompt_debug is not None else False
 
         super().__init__(
+            app_path=app_path,
             input_path=input_path,
             output_path=output_path,
             root_path=root_path,

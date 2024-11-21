@@ -5,6 +5,7 @@ from .generate_footer import generate_footer
 from .guess_language_for_markdown import guess_language_for_markdown
 from .generate_preface import generate_preface
 from .generate_code_block import generate_code_block
+from .add_readme import add_readme
 
 __all__ = [
     "generate_toc",
@@ -13,4 +14,5 @@ __all__ = [
     "guess_language_for_markdown",
     "generate_preface",
     "generate_code_block",
+    "add_readme",
 ]
