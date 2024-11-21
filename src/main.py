@@ -8,8 +8,8 @@ import os
 from pathlib import Path
 from config import config
 from util import initialize_provider
-from document import generate_doc, generate_toc
 from file import render_tree, find_files
+from document import generate_doc, generate_toc, add_readme
 
 
 def main(input_path: Path, dry_run: bool, summary: bool) -> None:
@@ -65,6 +65,9 @@ def main(input_path: Path, dry_run: bool, summary: bool) -> None:
 
                 # Generate table of contents
                 generate_toc(files)
+
+                # Add a README file
+                add_readme()
                 print("Done!")
 
         else:
