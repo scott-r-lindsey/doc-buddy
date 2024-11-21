@@ -4,7 +4,7 @@ from pathlib import Path
 from config import config
 
 
-def find_files(input_path: Path = None):
+def find_files(input_path: Path = None, limit_by_extensions_if_git=True):
 
     if input_path is None:
         input_path = config.input_path
@@ -13,7 +13,9 @@ def find_files(input_path: Path = None):
     git_root = config.root_path
 
     if gitmode:
-        return convert_str_array_to_path_array(get_git_repo_files(git_root, input_path))
+        return convert_str_array_to_path_array(
+            get_git_repo_files(git_root, input_path, limit_by_extensions_if_git)
+        )
 
     return convert_str_array_to_path_array(get_regular_folder_files(input_path))
 
@@ -33,7 +35,9 @@ def get_regular_folder_files(folder_path):
     return files
 
 
-def get_git_repo_files(repo_path: Path, folder_path: Path = None):
+def get_git_repo_files(
+    repo_path: Path, folder_path: Path = None, limit_by_extensions=True
+):
     """
     Finds all the files in a specific folder within a git repository, honoring
     .gitignore and filtering by extensions.
@@ -65,7 +69,7 @@ def get_git_repo_files(repo_path: Path, folder_path: Path = None):
         files = [file.strip() for file in result.stdout.split("\n") if file.strip()]
 
         # If extensions are provided via config.file_types, filter the files by the given extensions
-        if len(config.file_types) > 0:
+        if (len(config.file_types) > 0) and limit_by_extensions:
             extensions = [
                 ext if ext.startswith(".") else f".{ext}" for ext in config.file_types
             ]

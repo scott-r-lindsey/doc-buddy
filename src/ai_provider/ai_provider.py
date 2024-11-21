@@ -60,8 +60,8 @@ class AIProvider(ABC):
         :return: The default function block as a string.
         """
         return """
-        You may ask for the contents of any file in the project via function calling. Do not hesitate
-        to ask for the contents of a file if it would help you document the file you are currently working on.
+You may ask for the contents of any file in the project via function calling. Do not hesitate
+to ask for the contents of a file if it would help you document the file you are currently working on.
         """
 
     def generate_prompt(
