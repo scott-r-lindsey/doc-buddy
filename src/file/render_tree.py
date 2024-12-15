@@ -2,7 +2,7 @@ import os
 from config import config
 
 
-def render_tree(files, markdown=False, include_size=False):
+def render_tree(files, markdown=False, include_size=False, base_path=None):
     """
     Renders the list of files as a tree structure, similar to the Unix 'tree' command.
 
@@ -13,8 +13,11 @@ def render_tree(files, markdown=False, include_size=False):
     """
     tree = {}
     for file_path in files:
+        if base_path is None:
+            base_path = config.input_path
+
         # get the path relative to config.input_path
-        file = os.path.relpath(file_path, config.input_path)
+        file = os.path.relpath(file_path, base_path)
 
         parts = file.split(os.sep)
         current = tree
@@ -26,25 +29,26 @@ def render_tree(files, markdown=False, include_size=False):
     def build_tree_string(current, path="", indent=""):
         tree_str = ""
         keys = sorted(current.keys())
+
         for index, key in enumerate(keys):
             is_last = index == len(keys) - 1
             prefix = "└── " if is_last else "├── "
-            full_path = os.path.join(path, key)
+            relative_path = os.path.join(path, key)
 
             # Determine if we need to add file size
             size_str = ""
             if include_size and not current[key]:  # Only files, not directories
-                file_size = os.path.getsize(full_path)
+                file_size = os.path.getsize(base_path / relative_path)
                 size_str = f" [{file_size} bytes]"
 
             if markdown and not current[key]:
                 # Render as markdown link if markdown is enabled and it's a file
-                tree_str += f"{indent}{prefix}[{key}]({full_path}){size_str}\n"
+                tree_str += f"{indent}{prefix}[{key}]({relative_path}){size_str}\n"
             else:
                 tree_str += f"{indent}{prefix}{key}{size_str}\n"
 
             new_indent = indent + ("    " if is_last else "│   ")
-            tree_str += build_tree_string(current[key], full_path, new_indent)
+            tree_str += build_tree_string(current[key], relative_path, new_indent)
         return tree_str
 
     return build_tree_string(tree)
@@ -61,7 +65,7 @@ def render_tree_html(files, extension=""):
     tree = {}
     for file_path in files:
         # get the path relative to config.input_path
-        file = os.path.relpath(file_path, config.input_path)
+        file = os.path.relpath(file_path, config.targets_root_path)
 
         parts = file.split(os.sep)
         current = tree
@@ -76,18 +80,18 @@ def render_tree_html(files, extension=""):
         for index, key in enumerate(keys):
             is_last = index == len(keys) - 1
             prefix = "└── " if is_last else "├── "
-            full_path = os.path.join(path, key)
+            relative_path = os.path.join(path, key)
             if not current[key]:
                 # Apply the extension only to the final file link
-                full_path_with_extension = full_path + extension
+                relative_path_with_extension = relative_path + extension
                 # Render as an HTML link if it's a file
-                html_str += f'{indent}{prefix}<a href="{full_path_with_extension}" target="_blank">{key}</a><br>'
+                html_str += f'{indent}{prefix}<a href="{relative_path_with_extension}">{key}</a><br>'
             else:
                 html_str += f"{indent}{prefix}{key}<br>"
             new_indent = indent + (
                 "&nbsp;&nbsp;&nbsp;&nbsp;" if is_last else "│&nbsp;&nbsp;&nbsp;"
             )
-            html_str += build_html_string(current[key], full_path, new_indent)
+            html_str += build_html_string(current[key], relative_path, new_indent)
         return html_str
 
     html_output = '<pre style="font-family: monospace;">'

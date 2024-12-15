@@ -66,7 +66,7 @@ def generate_doc(file_path: Path, provider, tree):
     input_path = config.input_path
 
     # get a path for the file_path without the input_path
-    relative_path = file_path.relative_to(config.root_path)
+    relative_path = file_path.relative_to(config.targets_root_path)
 
     # Start spinner in a separate thread
     spinner_thread = threading.Thread(target=spinner)

@@ -32,7 +32,7 @@ def generate_footer(name, root=False):
     footer += "For more information, visit the [Doc-Buddy on GitHub](https://github.com/scott-r-lindsey/doc-buddy).  \n"
 
     if config.gitmode:
-        repo_path = config.root_path
+        repo_path = config.targets_root_path
         githash = os.popen(f"\ncd {repo_path} && git rev-parse HEAD").read().strip()
         footer += f"*{config.project_name} Commit Hash: {githash}*\n"
 
