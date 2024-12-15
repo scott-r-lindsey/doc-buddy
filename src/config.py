@@ -1,5 +1,12 @@
 """
 This module contains the Config class that is used to parse and store configuration
+
+paths:
+    user_cwd                - user's current working directory
+    docbuddy_root_path      - doc-buddy root
+    input_path              - folder or file to document
+    output_path             - folder for documentation
+    targets_root_path       - git project root, or user_cwd for non-git usage
 """
 
 import os
@@ -18,13 +25,13 @@ class Config(BaseModel):
     output_path: Path
 
     # the path to the git root
-    root_path: Path
+    targets_root_path: Path
 
     # the path to the user's current working directory
     user_cwd: Path
 
     # the path to doc-buddy
-    app_path: Path
+    docbuddy_root_path: Path
 
     file_types: List[str]
     dry_run: bool = False
@@ -42,7 +49,7 @@ class Config(BaseModel):
         load_dotenv()
         os.chdir(user_cwd)
 
-        app_path = Path(__file__).resolve().parent
+        docbuddy_root_path = Path(__file__).resolve().parent
 
         args = self.parse_args()
 
@@ -52,6 +59,7 @@ class Config(BaseModel):
         documentation_suffix = os.getenv("DOCUMENTATION_SUFFIX", ".md")
 
         user_cwd = Path(os.getcwd())
+
         input_path = (
             Path(args.input_path).resolve() if (args.input_path is not None) else None
         )
@@ -59,7 +67,9 @@ class Config(BaseModel):
             Path(args.output_path).resolve() if (args.output_path is not None) else None
         )
 
-        gitmode, root_path, project_name = self.find_gitmode(input_path, user_cwd)
+        gitmode, targets_root_path, project_name = self.find_gitmode(
+            input_path, user_cwd
+        )
 
         file_types = args.file_types if args.file_types is not None else []
         dry_run = args.dry_run if args.dry_run is not None else False
@@ -67,10 +77,10 @@ class Config(BaseModel):
         prompt_debug = args.prompt_debug if args.prompt_debug is not None else False
 
         super().__init__(
-            app_path=app_path,
+            docbuddy_root_path=docbuddy_root_path,
             input_path=input_path,
             output_path=output_path,
-            root_path=root_path,
+            targets_root_path=targets_root_path,
             user_cwd=user_cwd,
             file_types=file_types,
             dry_run=dry_run,
@@ -124,7 +134,7 @@ class Config(BaseModel):
         return args
 
     def find_gitmode(self, input_path: Path, user_cwd: Path):
-        root_path = user_cwd
+        targets_root_path = input_path
         gitmode = False
 
         # Change directory to the file's parent or the directory itself
@@ -139,7 +149,7 @@ class Config(BaseModel):
         while True:
             if (path / ".git").exists():
                 gitmode = True
-                root_path = path
+                targets_root_path = path
                 break
             # Move to the parent directory
             if path.parent == path:  # Reached the root directory
@@ -147,13 +157,13 @@ class Config(BaseModel):
             path = path.parent
 
         if gitmode:
-            print(f"-> Git root found at {root_path}")
+            print(f"-> Git root found at {targets_root_path}")
         else:
-            print(f"-> No Git root found, using {root_path}")
+            print(f"-> No Git root found, using {targets_root_path}")
 
-        project_name = root_path.name
+        project_name = targets_root_path.name
 
-        return gitmode, root_path, project_name
+        return gitmode, targets_root_path, project_name
 
 
 # Create a global config instance to be shared across all modules

@@ -24,11 +24,8 @@ def main(input_path: Path, dry_run: bool, summary: bool) -> None:
     """
     provider = initialize_provider()  # Initialize the provider
 
-    # Get the project directory from USER_CWD or fallback to current working directory
-    project_path = os.getenv("USER_CWD", os.getcwd())
-
-    context_files = find_files(Path(project_path), False)
-    context_tree = render_tree(context_files, False, True)
+    context_files = find_files(config.targets_root_path, False)
+    context_tree = render_tree(context_files, False, True, config.targets_root_path)
 
     if summary:
         print("Generating summary...")

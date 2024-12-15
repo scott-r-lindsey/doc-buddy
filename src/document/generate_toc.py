@@ -43,6 +43,6 @@ def find_name():
     Finds the name of the project.
     """
     if config.gitmode:
-        return os.path.basename(config.root_path)
+        return os.path.basename(config.targets_root_path)
 
     return os.path.basename(os.getcwd())
