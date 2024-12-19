@@ -5,6 +5,7 @@ This module contains utility functions that are used by the main script.
 import os
 import sys
 from pathlib import Path
+from ai_provider.ollama_ai_provider import OllamaAIProvider
 from ai_provider.open_ai_provider import OpenAIProvider
 from ai_provider.google_gen_ai_provider import GoogleGenAIProvider
 from ai_provider.vertexai_ai_provider import VertexAIProvider
@@ -70,6 +71,10 @@ def initialize_provider():
     elif provider_name == "OPENAI":
         print("-> Using OpenAI provider")
         provider = OpenAIProvider()
+
+    elif provider_name == "OLLAMA":
+        print("-> Using Ollama AI provider")
+        provider = OllamaAIProvider()
 
     else:
         print("Error: AI provider not found.")

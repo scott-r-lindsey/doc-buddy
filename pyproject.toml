@@ -15,6 +15,7 @@ vertexai = "^1.70.0"
 pathspec = "^0.12.1"
 pydantic = "^2.9.2"
 pydantic-settings = "^2.6.0"
+ollama = "^0.3.3"
 
 
 [tool.poetry.group.dev.dependencies]
